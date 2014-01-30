@@ -31,11 +31,11 @@ def clone(a):
             children_to_clone = spw.list_children(a.channel)
         except (Spacewalk.SpacewalkError,
                 Spacewalk.SpacewalkChannelNotFound) as e:
-            sys.exit("Error listing children: {err}".format(f=sys.argv[0],
-                                                            err=e))
+            sys.exit("Error listing children: \n{err}".format(f=sys.argv[0],
+                                                              err=e))
 
-        month = time.strftime("%m")
-        new_channel = {
+        month = time.strftime("%b").lower()  # abbrv month name
+        new_parent = {
             'name':
             '{proj}-{mon}-{tag}-{orig}'.format(proj=a.project, mon=month,
                                                tag=a.tag,
@@ -43,7 +43,7 @@ def clone(a):
             'label':
             '{proj}-{mon}-{tag}-{orig}'.format(proj=a.project, mon=month,
                                                tag=a.tag,
-                                               org=parent_details['label']),
+                                               orig=parent_details['label']),
             'summary':
             '''Clone of {orig} for {proj} tag {tag}.
             This will be only available during {mon} after \
@@ -53,9 +53,10 @@ def clone(a):
         }
 
         try:
-            spw.clone_channel(a.channel, new_channel, True)
+            spw.clone_channel(a.channel, new_parent, True)
         except Spacewalk.SpacewalkError as e:
-            sys.exit("Error cloning channel: {err}".format(err=e))
+            sys.exit("Error cloning channel {c}:\n"
+                     "{err}".format(err=e, c=parent_details['label']))
 
         for channel in children_to_clone:
             chann = spw.get_channel_details(channel)
@@ -67,19 +68,22 @@ def clone(a):
                 'label':
                 '{proj}-{mon}-{tag}-{orig}'.format(proj=a.project, mon=month,
                                                    tag=a.tag,
-                                                   org=chann['label']),
+                                                   orig=chann['label']),
                 'summary':
                 '''Clone of {orig} for {proj} tag {tag}.
                 This will be only available during {mon} after \
                 which it will be updated.'''.format(orig=chann['name'],
                                                     proj=a.project, tag=a.tag,
                                                     mon=month),
+                'parent_label':
+                new_parent['label'],
             }
 
             try:
                 spw.clone_channel(chann['label'], new_channel, True)
             except Spacewalk.SpacewalkError as e:
-                sys.exit("Error cloning channel: {err}".format(err=e))
+                sys.exit("Error cloning channel {c}:\n"
+                         "{err}".format(c=chann['label'], err=e))
 
 
 def delete(a):
@@ -117,9 +121,9 @@ def migrate(a):
     :returns: Boolean
 
     '''
-    with Spacewalk.Spacewalk(a.server, a.username, a.verbose) as spw:
-        spw.subscribe_base_channel(spw.list_subscribed_servers(a.from_channel),
-                                   a.to_channel)
+    with Spacewalk.Spacewalk(a.serverurl, a.username, a.verbose) as spw:
+        for system in spw.list_subscribed_servers(a.from_channel):
+            spw.subscribe_base_channel(system, a.to_channel)
 
 
 if __name__ == '__main__':
@@ -150,6 +154,10 @@ if __name__ == '__main__':
                                         base channel.''')
     parse_clone.add_argument('-c', '--channel', required=True,
                              help='Channel to clone. Must be a base channel.')
+    parse_clone.add_argument('-p', '--project', required=True,
+                             help='Name of Project clone will be used for')
+    parse_clone.add_argument('-t', '--tag', required=True,
+                             help='Name of Project Tag clone will be used for')
     parse_clone.set_defaults(func=clone)
 
     parse_delete = subparsers.add_parser('delete',
