@@ -374,9 +374,10 @@ class Spacewalk(object):
             raise SpacewalkAPIError("System cannot be subscribed to \
                                     {}".format(channel))
 
+        self._api_call('system.set_base_channel', systemid, channel)
+
         sub_chans = [x['label'] for x in
                      self._api_call('system.list_subscribable_child_channels',
                                     systemid)]
 
-        self._api_call('system.set_base_channel', systemid, channel)
         self._api_call('system.set_child_channels', systemid, sub_chans)
