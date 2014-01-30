@@ -1,0 +1,12 @@
+# ignore vim swap files
+.*.s[a-w][a-z]
+*.un~
+Session.vim
+.netrwhist
+*~
+
+
+# ignore python bytecode files
+*py[oc]
+backups
+.ropeproject
