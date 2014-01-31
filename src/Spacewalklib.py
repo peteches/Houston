@@ -312,8 +312,8 @@ class Spacewalk(object):
             ret = self._client.channel.software.clone(self._key, channel,
                                                       new_channel, state)
         except Exception as e:
-            raise SpacewalkError("Error: Unable to clone channel: {}\n"
-                                 "{err}".format(channel, err=e))
+            raise SpacewalkError("Error: Unable to clone channel: {c}\n"
+                                 "{err}".format(c=channel, err=e))
         else:
             return ret
 
