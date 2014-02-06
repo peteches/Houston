@@ -1,0 +1,469 @@
+#! /usr/bin/python3
+''' Script to manage spacewalk channels.
+
+'''
+# imports
+
+import sys
+import time
+sys.path.append('./')
+import Spacewalklib as Spacewalk
+import pprint
+
+
+def clone(a):
+    '''Clones Channel
+
+    :param a: cmd line Args as returned from :func:`argparse.parse_args`
+    :returns: Boolean
+
+    '''
+    with Spacewalk.Spacewalk(a.serverurl, a.username) as spw:
+
+        try:
+            parent_details = spw.get_channel_details(a.channel)
+        except Spacewalk.SpacewalkError as e:
+            sys.exit("Error: {}".format(e))
+
+        if parent_details['parent_channel_label']:
+            sys.exit('Error: {} is not Base channel.'.format(a.channel))
+
+        try:
+            children_to_clone = spw.list_children(a.channel)
+        except (Spacewalk.SpacewalkError,
+                Spacewalk.SpacewalkChannelNotFound) as e:
+            sys.exit("Error listing children: \n{err}".format(f=sys.argv[0],
+                                                              err=e))
+
+        month = time.strftime("%b").lower()  # abbrv month name
+        new_parent = {
+            'name':
+            'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project, mon=month,
+                                                   tag=a.tag,
+                                                   orig=parent_details['name']),
+            'label':
+            'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project, mon=month,
+                                                   tag=a.tag,
+                                                   orig=parent_details['label']),
+            'summary':
+            '''Development clone of {orig} for {proj} tag {tag}.
+            This will be only available during {mon} after \
+            which it will be updated.'''.format(orig=parent_details['name'],
+                                                proj=a.project, tag=a.tag,
+                                                mon=month),
+        }
+
+        try:
+            spw.clone_channel(a.channel, new_parent, False)
+        except Spacewalk.SpacewalkError as e:
+            sys.exit("Error cloning channel {c}:\n"
+                     "{err}".format(err=e, c=parent_details['label']))
+
+        for channel in children_to_clone:
+            chann = spw.get_channel_details(channel)
+            new_channel = {
+                'name':
+                'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project,
+                                                       mon=month, tag=a.tag,
+                                                       orig=chann['name']),
+                'label':
+                'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project,
+                                                       mon=month, tag=a.tag,
+                                                       orig=chann['label']),
+                'summary':
+                '''Development clone of {orig} for {proj} tag {tag}.
+                This will be only available during {mon} after \
+                which it will be updated.'''.format(orig=chann['name'],
+                                                    proj=a.project, tag=a.tag,
+                                                    mon=month),
+                'parent_label':
+                new_parent['label'],
+            }
+
+            try:
+                spw.clone_channel(chann['label'], new_channel, False)
+            except Spacewalk.SpacewalkError as e:
+                sys.exit("Error cloning channel {c}:\n"
+                         "{err}".format(c=chann['label'], err=e))
+
+
+def delete(a):
+    '''Removes Channel and optionally any subchannels
+
+    :param a: cmd line Args as returned from :func:`argparse.parse_args`
+
+    :returns: Boolean
+
+    '''
+    with Spacewalk.Spacewalk(a.serverurl, a.username) as spw:
+        if not spw.channel_exists:
+            return True
+        child_channels = spw.list_children(a.channel)
+        if bool(child_channels) and not a.recursive:
+            sys.exit("""Channel {} has children. \n
+                     Use recursive flag to delete these channels as well.\
+                     """.format(a.channel).replace('  ', ''))
+
+        if a.recursive:
+            for child in child_channels:
+                if a.verbose:
+                    print("Deleting channel: {}".format(child))
+                spw.remove_channel(child)
+        if a.verbose:
+            print("Deleting channel: {}".format(a.channel))
+        spw.remove_channel(a.channel)
+
+
+def migrate(a):
+    '''takes a list of all servers registered to from-channel and re-registers
+    them to the to-channel.
+
+    :param a: cmd line Args as returned from :func:`argparse.parse_args`
+    :returns: Boolean
+
+    '''
+    with Spacewalk.Spacewalk(a.serverurl, a.username, a.verbose) as spw:
+        for system in spw.list_subscribed_servers(a.from_channel):
+            spw.subscribe_base_channel(system, a.to_channel)
+
+
+def rollout(a):
+    '''Rolls out channels the next environment up
+
+    :param a: cmd line Args as returned from :func:`argparse.parse_args`
+    :type a: Namespace obj :class:`argparse.Namespace`
+    :returns: Boolean
+
+    Rolls out a set of channels from one environment to the next according to
+    the matrix below:
+
+    ======= =======
+    old env new env
+    ======= =======
+      DEV     QA
+      QA     STAGE
+     STAGE   PROD
+    ======= =======
+
+    New env is what is supplied to the function and the source is calculated.
+
+    '''
+    with Spacewalk.Spacewalk(a.serverurl, a.username, a.verbose) as spw:
+        if not spw.channel_exists(a.channel):
+            sys.exit("Error: Channel {c} Does not exist".format(c=a.channel))
+
+        rollout_order = ('dev', 'qa', 'stage', 'prod')
+        src_env = a.channel.split('-')[0]
+        dst_env = rollout_order[rollout_order.index(src_env) + 1]
+
+        old_channel = spw.get_channel_details(a.channel)
+        new_channel = {
+            'label': old_channel['label'].replace(src_env, dst_env),
+            'name': old_channel['name'].replace(src_env, dst_env),
+            'summary': old_channel['summary'].replace(src_env, dst_env),
+        }
+
+        try:
+            spw.clone_channel(a.channel, new_channel, False)
+        except Spacewalk.SpacewalkError as e:
+            sys.exit("Error cloning channel {c}:\n"
+                     "{err}".format(err=e, c=a.channel))
+
+        for child in spw.list_children(a.channel):
+            old_channel = spw.get_channel_details(child)
+            # yeah this is a little tedious, but it appears that the dict
+            # returned from a get_details call has different keys than that
+            # accepted by the clone channel api call.
+            new_channel = {
+                'label':
+                old_channel['label'].replace(src_env, dst_env),
+                'name':
+                old_channel['name'].replace(src_env, dst_env),
+                'summary':
+                old_channel['summary'].replace(src_env, dst_env),
+                'description':
+                old_channel['description'].replace(src_env, dst_env),
+                'parent_label':
+                old_channel['parent_channel_label'].replace(src_env, dst_env),
+            }
+
+            try:
+                spw.clone_channel(child, new_channel, False)
+            except Spacewalk.SpacewalkError as e:
+                sys.exit("Error cloning channel {c}:\n"
+                         "{err}".format(err=e, c=child))
+
+
+def _generate_lucerne_query(kwargs):
+    '''generates a lucerne query from the tags provided.
+
+    :param **kwargs: keyword pairs to distill into lucerne query
+    :returns: string query
+
+    '''
+    retval = ""
+    for field,value in kwargs.items():
+        retval = retval + '{k}:"{v}" AND '.format(k=field, v=value)
+
+    return retval[:-5]  # splice trims the final ' AND '
+
+def _obtain_list_of_pkgs(a, spw, all_channels=False):
+    '''gets a list of packages from the spacewalk server
+
+    :param a: @todo
+    :type a: @todo
+    :param spw: instance of spacewalk
+    :type spw: ;class:`Spacewalklib.Spacewalk`
+    :param all_channels: search all channels?
+            If False looks for a.channels as a list of channels to look in.
+            This is the default behaviour.
+    :returns: dict
+            * dict
+
+                * _int_ id
+                * _str_ name
+                * _str_ epoch
+                * _str_ version
+                * _str_ release
+                * _str_ arch_label
+                * array "providing channels"
+
+                    * _str_ channel label providing this package
+                * _str_ build_host
+                * _str_ description
+                * _str_ checksum
+                * _str_ checksum_type
+                * _str_ vendor
+                * _str_ summary
+                * _str_ cookie
+                * _str_ license
+                * _str_ file
+                * _str_ build_date
+                * _str_ last_modified_date
+                * _str_ size
+                * _str_ path - the path on the satellite servers file system
+                * _str_ payload_size
+
+    '''
+    if all_channels:
+        channels = None
+    else:
+        channels = a.channels
+    if not a.query:
+        lucerne = {}
+        for tag in ['name', 'version', 'release', 'epoch']:
+            if getattr(a, tag):
+                lucerne[tag] = getattr(a, tag)
+        a.query = _generate_lucerne_query(lucerne)
+
+    if a.name:
+        pkgs = [x for x in
+                spw.lucerne_query(a.query, channels=channels)
+                if x['name'] == a.name]
+    else:
+        pkgs = spw.lucerne_query(a.query, channels=channels)
+
+    if len(pkgs) == 0:
+        sys.exit("Package {n} Cannot be found.".format(n=a.name))
+    else:
+        cnt = 1
+        print("Please choose a package:")
+
+        w = {'name': 4,
+             'version': 7,
+             'release': 7,
+             'epoch': 5,
+             'arch': 4,
+             }
+
+        # obtain largest length of field for each field
+        for pkg in pkgs:
+            for key in w.keys():
+                if w[key] < len(pkg[key]):
+                    w[key] = len(pkg[key])
+
+        format_string = "{c:>3} {n:<{nw}} {v:>{vw}} {r:>{rw}} " \
+                        "{e:>{ew}} {a:>{aw}}"
+        print(format_string.format(c="", n="Name", nw=w['name'], v="Version",
+                                   vw=w['version'], r="Release",
+                                   rw=w['release'], e="Epoch", ew=w['epoch'],
+                                   a="Arch", aw=w['arch'], end=' '))
+
+        for pkg in pkgs:
+            print(format_string.format(c=cnt, n=pkg['name'], nw=w['name'],
+                                       v=pkg['version'], vw=w['version'],
+                                       r=pkg['release'], rw=w['release'],
+                                       e=pkg['epoch'], ew=w['epoch'],
+                                       a=pkg['arch'], aw=w['arch'], end=' '))
+
+            cnt += 1
+        print("\nPress 'q' to quit.")
+        try:
+            choice = input('Number: ')
+        except KeyboardInterrupt:
+            sys.exit("\nQuitter.")
+        if choice == 'q':
+            sys.exit("Quitter.")
+
+    return pkgs[int(choice)-1]
+
+
+def pkg_remove(a):
+    '''@todo: Docstring for rollback
+
+    :param a: @todo
+    :type a: @todo
+    :returns: @todo
+
+    '''
+
+    with Spacewalk.Spacewalk() as spw:
+        pkg = _obtain_list_of_pkgs(a, spw)
+
+        deps = spw.pkg_what_depends(pkg)
+
+        spw.channel_remove_pkg([pkg['id']], a.channels)
+
+        for channel in a.channels:
+            srvids.extend(spw.list_subscribed_servers(channel))
+
+
+def pkg_add(a):
+    '''adds a package to a specified channel(s)
+
+
+    '''
+    if not a.channels:
+        sys.exit()
+    with Spacewalk.Spacewalk() as spw:
+        pkg = _obtain_list_of_pkgs(a, spw, True)
+
+        rv = spw.channel_add_pkg([pkg['id']], a.channels)
+def parse_cmd_line():
+    '''Parses commad line
+    :returns: namespace object
+
+    '''
+    import argparse
+    # opts
+    parent_parser = argparse.ArgumentParser(description='Channel management script.')
+    parent_parser.add_argument('-s', '--serverurl', required=False,
+                        help='Url for the spacewalk  server.\
+                        default https://cm1.dev.solutions.local/rpc/api')
+    parent_parser.add_argument('-u', '--username', required=False,
+                        help='Username used to log into the spacewalk server.')
+    parent_parser.add_argument('-v', '--verbose', help="displays more info",
+                        action='store_true')
+    parent_parser.add_argument('--version', action='version',
+                        version='%(prog)s 0.1')
+
+    subparsers = parent_parser.add_subparsers(help="sub-command help",
+                                        title='Commands',
+                                        description='Valid Sub-commands')
+
+    channel_p = subparsers.add_parser('channel')
+    channel_sp = channel_p.add_subparsers(title='Channel Commands',
+                                          description='commands related to '
+                                          'channel management.')
+    package_p = subparsers.add_parser('pkg')
+    package_sp = package_p.add_subparsers(title='Package Commands',
+                                            description='Commands to manipulate'
+                                            'packages on spacewalk server')
+    ######################
+    #  Channel commands  #
+    ######################
+
+    channel_args = argparse.ArgumentParser(add_help=False)
+    channel_args.add_argument('-c', '--channel', required=True,
+                              help='Channel to operate on')
+
+    #  clone
+
+    parse_clone = channel_sp.add_parser('clone', parents=[channel_args],
+                                        help='''clones base channel and
+                                        children.  This may only be called on a
+                                        base channel.''')
+    parse_clone.add_argument('-p', '--project', required=True,
+                                help='Name of Project clone will be used for')
+    parse_clone.add_argument('-t', '--tag', required=True,
+                                help='Name of Project Tag clone will be used for')
+    parse_clone.set_defaults(func=clone)
+
+    #  delete
+
+    parse_delete = channel_sp.add_parser('delete', parents=[channel_args],
+                                            help='deletes a channel')
+    parse_delete.add_argument('-r', '--recursive', required=False,
+                                default=False, action='store_true',
+                                help='Delete all child channels as well.')
+    parse_delete.set_defaults(func=delete)
+
+    #  Migrate
+
+    parse_migrate = channel_sp.add_parser('migrate',
+                                            help='''Migrates all servers
+                                            registered against <from-channel> and
+                                            re-registers them to <to-channel>''')
+    parse_migrate.add_argument('-f', '--from-channel', required=True,
+                                help='Channel to migrate servers from')
+    parse_migrate.add_argument('-t', '--to-channel', required=True,
+                                help='Channel to migrate servers to')
+    parse_migrate.set_defaults(func=migrate)
+
+    #  rollout
+
+    parse_rollout = channel_sp.add_parser('rollout', parents=[channel_args],
+                                            help='Rolls out changes from one env'
+                                            'to the next. e.g. dev -> qa')
+    parse_rollout.set_defaults(func=rollout)
+
+    ######################
+    #  Package Commands  #
+    ######################
+
+    pkg_args = argparse.ArgumentParser(add_help=False)
+
+    lucerne_or_Nvrea = \
+        pkg_args.add_mutually_exclusive_group(required=True)
+    lucerne_or_Nvrea.add_argument('-q', '--query',
+                                    help='lucerne query '
+                                    '(see: http://lucene.apache.org/')
+    lucerne_or_Nvrea.add_argument('-n', '--name',
+                                    help='Name of package to remove')
+    pkg_args.add_argument('-v', '--version', required=False,
+                                    help='version of the package to remove')
+    pkg_args.add_argument('-r', '--release', required=False,
+                                    help='Release of the package to remove')
+    pkg_args.add_argument('-e', '--epoch', required=False,
+                                    help='Epoch of the package to remove')
+    pkg_args.add_argument('-c', '--channels', nargs='+', required=True,
+                          help='''channels to restrict pkg operations to
+                          Multiple comma seperated channels can be
+                          specified''')
+
+    # remove
+    parse_pkg_remove = package_sp.add_parser('remove', parents=[pkg_args],
+                                             help='Remove package version'
+                                             'from specified channel. Will'
+                                             'prompt if multiple pckages match'
+                                             ' the command line')
+    parse_pkg_remove.set_defaults(func=pkg_remove)
+
+    # add
+    parse_pkg_add = package_sp.add_parser('add', parents=[pkg_args],
+                                          help='''Adds Specified package to
+                                          channels provided.''')
+    parse_pkg_add.set_defaults(func=pkg_add)
+
+    ns = parent_parser.parse_args()
+    return ns
+
+
+if __name__ == '__main__':
+
+    args = parse_cmd_line()
+
+    if 'func' in args:
+        args.func(args)
+    else:
+        parent_parser.print_help()
