@@ -26,35 +26,7 @@ def _convert_from_camel_case(name):
     return re.sub(r'([A-Z])', r'_\1', name).lower()
 
 
-def __label_cmp__(s, o):
-    '''determines which is more current segment of version / release
-
-    :param s: @todo
-    :type s: @todo
-    :param o: @todo
-    :type o: @todo
-    :returns: @todo
-
-    '''
-    retval = 0
-    if o.isdigit() and not s.isdigit():
-        retval = 1
-    elif not o.isdigit() and s.isdigit():
-        retval = -1
-    elif o.isdigit() and s.isdigit():
-        if int(o) > int(s):
-            retval = 1
-        elif int(o) < int(s):
-            retval = -1
-    elif o > s:
-        retval = 1
-    elif o < s:
-        retval = -1
-
-    return retval
-
-
-def __convert_label_to_list(label):
+def _convert_label_to_list(label):
     '''Converts string version or release into a list of it's constituent
     parts.
 
@@ -67,12 +39,7 @@ def __convert_label_to_list(label):
 
     label = re.split(r'[^A-Za-z0-9]+', label)
 
-    rv = []
-    for x in label:
-        if x.isdigit():
-            x = int(x)
-        rv.append(x)
-    return rv
+    return label
 
 
 class SpacewalkError(Exception):
@@ -600,6 +567,8 @@ class PKG(collections.UserDict):
 
         '''
         self.data = {}
+        self.__NEWER__ = 1
+        self.__OLDER__ = -1
         self.__spw__ = spw
         self.ns = 'packages'
         self.api_call = self.__spw__.api_call
@@ -633,30 +602,39 @@ class PKG(collections.UserDict):
         retval = 0
         for label in ['version', 'release']:
 
-            l_self = __convert_label_to_list(self[label])
-            l_other = __convert_label_to_list(other[label])
+            l_self = _convert_label_to_list(self.data[label])
+            try:
+                l_other = _convert_label_to_list(other[label])
+            except TypeError:
+                if label == 'version':
+                    l_other = _convert_label_to_list(other)
+                else:
+                    return 0
 
             if len(l_self) > len(l_other):
                 rng = range(0, len(l_self))
-                shorter = (l_other, -1)
+                shorter = (l_other, self.__NEWER__)
+
             elif len(l_self) < len(l_other):
                 rng = range(0, len(l_other))
-                shorter = (l_self, 1)
+                shorter = (l_self, self.__OLDER__)
+
             else:
                 rng = range(0, len(l_self))
                 shorter = None
 
             for i in rng:
-                if shorter:
-                    if len(shorter[0]) <= i:
-                        retval = shorter[1]
-                        break
-
                 s = l_self[i]
                 o = l_other[i]
 
-                retval = __label_cmp__(s, o)
-                if retval != 0:
+                retval = self._label_cmp__(s, o)
+
+                if retval == 0:
+                    if shorter:
+                        if len(shorter[0]) <= i + 1:
+                            return shorter[1]
+
+                else:
                     return retval
 
         return 0
@@ -666,61 +644,100 @@ class PKG(collections.UserDict):
             if other['name'] != self.data['name']:
                 return False
         except TypeError:
-            if self.__cmp__(other) == 0:
-                return True
-            else:
-                return False
+            pass
+
+        if self.__cmp__(other) == 0:
+            return True
+        else:
+            return False
 
     def __ne__(self, other):
         try:
             if other['name'] != self.data['name']:
-                return False
-        except TypeError:
-            if self.__cmp__(other) != 0:
                 return True
-            return False
+        except TypeError:
+            pass
+
+        if self.__cmp__(other) != 0:
+            return True
+        return False
 
     def __lt__(self, other):
         try:
             if other['name'] != self.data['name']:
                 raise NotImplementedError
         except TypeError:
-            if self.__cmp__(other) == 1:
-                return True
-            else:
-                return False
+            pass
+
+        if self.__cmp__(other) == self.__OLDER__:
+            return True
+        else:
+            return False
 
     def __le__(self, other):
         try:
             if other['name'] != self.data['name']:
                 raise NotImplementedError
         except TypeError:
-            if self.__cmp__(other) == 0 or \
-                    self.__cmp__(other) == 1:
-                return True
-            else:
-                return False
+            pass
+
+        if self.__cmp__(other) == 0 or \
+                self.__cmp__(other) == self.__OLDER__:
+            return True
+        else:
+            return False
 
     def __gt__(self, other):
         try:
             if other['name'] != self.data['name']:
                 raise NotImplementedError
         except TypeError:
-            if self.__cmp__(other) == -1:
-                return True
-            else:
-                return False
+            pass
+
+        if self.__cmp__(other) == self.__NEWER__:
+            return True
+        else:
+            return False
 
     def __ge__(self, other):
         try:
             if other['name'] != self.data['name']:
                 raise NotImplementedError
         except TypeError:
-            if self.__cmp__(other) == 0 or \
-                    self.__cmp__(other) == -1:
-                return True
-            else:
-                return False
+            pass
+
+        if self.__cmp__(other) == 0 or \
+                self.__cmp__(other) == self.__NEWER__:
+            return True
+        else:
+            return False
+
+    def _label_cmp__(self, s, o):
+        '''determines which is more current segment of version / release
+
+        :param s: @todo
+        :type s: @todo
+        :param o: @todo
+        :type o: @todo
+        :returns: @todo
+
+        '''
+        retval = 0
+        if s.isdigit() and not o.isdigit():
+            retval = self.__NEWER__
+        elif not s.isdigit() and o.isdigit():
+            retval = self.__OLDER__
+        elif s.isdigit() and o.isdigit():
+            if int(s) > int(o):
+                retval = self.__NEWER__
+            elif int(s) < int(o):
+                retval = self.__OLDER__
+        elif s > o:
+            retval = self.__NEWER__
+        elif s < o:
+            retval = self.__OLDER__
+
+        return retval
 
     def pkg_what_depends(self, pkgid, channel):
         '''Determines which packages depend on pkgid provided within
