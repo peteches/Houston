@@ -662,41 +662,65 @@ class PKG(collections.UserDict):
         return 0
 
     def __eq__(self, other):
-        if self.__cmp__(other) == 0:
-            return True
-        else:
-            return False
+        try:
+            if other['name'] != self.data['name']:
+                return False
+        except TypeError:
+            if self.__cmp__(other) == 0:
+                return True
+            else:
+                return False
 
     def __ne__(self, other):
-        if self.__cmp__(other) != 0:
-            return True
-        return False
+        try:
+            if other['name'] != self.data['name']:
+                return False
+        except TypeError:
+            if self.__cmp__(other) != 0:
+                return True
+            return False
 
     def __lt__(self, other):
-        if self.__cmp__(other) == 1:
-            return True
-        else:
-            return False
+        try:
+            if other['name'] != self.data['name']:
+                raise NotImplementedError
+        except TypeError:
+            if self.__cmp__(other) == 1:
+                return True
+            else:
+                return False
 
     def __le__(self, other):
-        if self.__cmp__(other) == 0 or \
-                self.__cmp__(other) == 1:
-            return True
-        else:
-            return False
+        try:
+            if other['name'] != self.data['name']:
+                raise NotImplementedError
+        except TypeError:
+            if self.__cmp__(other) == 0 or \
+                    self.__cmp__(other) == 1:
+                return True
+            else:
+                return False
 
     def __gt__(self, other):
-        if self.__cmp__(other) == -1:
-            return True
-        else:
-            return False
+        try:
+            if other['name'] != self.data['name']:
+                raise NotImplementedError
+        except TypeError:
+            if self.__cmp__(other) == -1:
+                return True
+            else:
+                return False
 
     def __ge__(self, other):
-        if self.__cmp__(other) == 0 or \
-                self.__cmp__(other) == -1:
-            return True
-        else:
-            return False
+        try:
+            if other['name'] != self.data['name']:
+                raise NotImplementedError
+        except TypeError:
+            if self.__cmp__(other) == 0 or \
+                    self.__cmp__(other) == -1:
+                return True
+            else:
+                return False
 
     def pkg_what_depends(self, pkgid, channel):
         '''Determines which packages depend on pkgid provided within
