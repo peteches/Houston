@@ -238,7 +238,7 @@ class Spacewalk(object):
         :type namespace: string
         :param method: Method to call
         :type method: string
-        :param *args: any arguments to pass to api call
+        :param \*args: any arguments to pass to api call
 
         :returns: result of api call
 
@@ -292,8 +292,10 @@ class Spacewalk(object):
         '''gets a list of child channels from channel
 
         :param channel: channel whos children should be obtained
+
+        .. See here:https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-channel_software-listChildren.html
+
         :returns: list of channel labels
-        .. See : https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-channel_software-listChildren.html
 
         '''
         try:
@@ -318,8 +320,9 @@ class Spacewalk(object):
         :param state: keep Original state.
         :type state: Boolean
 
-        .. See here : https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-channel_software-clone.html
-        :returns: @todo
+        .. See here:https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-channel_software-clone.html
+
+        :returns: Bool
 
         '''
         try:
@@ -421,15 +424,15 @@ class Spacewalk(object):
 
                 * _dict_ - package overview
 
-                    * _int_ - id
-                    * _str_ - name
-                    * _str_ - summary
-                    * _str_ - description
-                    * _str_ - version
-                    * _str_ - release
-                    * _str_ - arch
-                    * _str_ - epoch
-                    * _str_ - provider
+                    * *int* - id
+                    * *str* - name
+                    * *str* - summary
+                    * *str* - description
+                    * *str* - version
+                    * *str* - release
+                    * *str* - arch
+                    * *str* - epoch
+                    * *str* - provider
 
         runs the lucerne query provided and returs a list of dicts with
         the keys above.
@@ -475,29 +478,29 @@ class Spacewalk(object):
         :returns: dict
             * dict
 
-                * _int_ id
-                * _str_ name
-                * _str_ epoch
-                * _str_ version
-                * _str_ release
-                * _str_ arch_label
+                * *int* id
+                * *str* name
+                * *str* epoch
+                * *str* version
+                * *str* release
+                * *str* arch_label
                 * array "providing channels"
 
-                    * _str_ channel label providing this package
-                * _str_ build_host
-                * _str_ description
-                * _str_ checksum
-                * _str_ checksum_type
-                * _str_ vendor
-                * _str_ summary
-                * _str_ cookie
-                * _str_ license
-                * _str_ file
-                * _str_ build_date
-                * _str_ last_modified_date
-                * _str_ size
-                * _str_ path - the path on the satellite servers file system
-                * _str_ payload_size
+                    * *str* channel label providing this package
+                * *str* build_host
+                * *str* description
+                * *str* checksum
+                * *str* checksum_type
+                * *str* vendor
+                * *str* summary
+                * *str* cookie
+                * *str* license
+                * *str* file
+                * *str* build_date
+                * *str* last_modified_date
+                * *str* size
+                * *str* path - the path on the satellite servers file system
+                * *str* payload_size
 
         '''
         return self.api_call('packages', 'get_details', pkgid)
@@ -750,9 +753,9 @@ class PKG(collections.UserDict):
 
                 * tuple
 
-                    * _int_ - pkgid ( of dependant package)
-                    * _str_ - the provides it was dependant on
-                    * _str_ - Version dependant on
+                    * *int* - pkgid ( of dependant package)
+                    * *str* - the provides it was dependant on
+                    * *str* - Version dependant on
 
         '''
         pkg_provides = [x['dependency']
