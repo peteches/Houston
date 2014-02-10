@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Command line usage &mdash; Houston 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Houston 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to Houston’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Houston’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Houston 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="command-line-usage">
+<span id="cli-usage"></span><h1>Command line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
+<p>Houston cli is an easy and convienient way to manage your spacewalk / satellite
+Server. It allows you to do complex time coonsuming tasks quickly and easily
+such as cloning whole channel groups, adding and removing packages from your
+channels having any subscribed systems downgrade their installed versions to
+match.</p>
+<p>This is still a work in progress but new features will be added as they are
+coded.</p>
+<p>Usage::</p>
+<div class="highlight-python"><pre>houston [general options] COMMAND &lt;command options&gt;</pre>
+</div>
+<p>General options are:</p>
+<dl class="option">
+<dt id="cmdoption-s">
+<tt class="descname">-s</tt><tt class="descclassname"> &lt;url&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--serverurl</tt><tt class="descclassname"> &lt;url&gt;</tt><a class="headerlink" href="#cmdoption-s" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the url of the spacewalk / satellite server to connect to.
+Although this argument is optional if it is omitted it must be found in
+the configuration file. See <cite>config</cite> for more details.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-u">
+<tt class="descname">-u</tt><tt class="descclassname"> &lt;username&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--username</tt><tt class="descclassname"> &lt;username&gt;</tt><a class="headerlink" href="#cmdoption-u" title="Permalink to this definition">¶</a></dt>
+<dd><p>This is the username to authenticate with. Again if ommited it must be
+present in the configuration file. See <cite>config</cite> for more details.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption--version">
+<tt class="descname">--version</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--version" title="Permalink to this definition">¶</a></dt>
+<dd><p>version of houston being invoked.</p>
+</dd></dl>
+
+<p>In addition a password is required to successfully authenticate against the
+spacewalk server. If this is not found in the <cite>config</cite> file then houston will
+prompt the user for a password if it is able. Otherwise houston will abort.</p>
+</div>
+<div class="section" id="commands">
+<span id="cli-commands"></span><h1>Commands:<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#cli-channel-commands"><em>channel</em></a></li>
+<li><a class="reference internal" href="#cli-pkg-commands"><em>Package Commands</em></a></li>
+</ul>
+</div></blockquote>
+<div class="section" id="channel">
+<span id="cli-channel-commands"></span><h2>channel<a class="headerlink" href="#channel" title="Permalink to this headline">¶</a></h2>
+<p>The Channel commands all relate to tasks involving channels. These will be
+expanded upon.</p>
+<dl class="docutils">
+<dt>Channel commands available:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#cli-channel-clone"><em>clone</em></a></li>
+<li><a class="reference internal" href="#cli-channel-delete"><em>delete</em></a></li>
+<li><a class="reference internal" href="#cli-channel-migrate"><em>Migrate</em></a></li>
+<li><a class="reference internal" href="#cli-channel-rollout"><em>Rollout</em></a></li>
+</ul>
+</dd>
+</dl>
+<div class="section" id="clone">
+<span id="cli-channel-clone"></span><h3>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h3>
+<p>The clone subcommand will take a base channel and clone it using a specific
+nameing scheme.</p>
+<p>OPTIONS:</p>
+<dl class="option">
+<dt id="cmdoption-p">
+<tt class="descname">-p</tt><tt class="descclassname"> &lt;project name&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--project</tt><tt class="descclassname"> &lt;project name&gt;</tt><a class="headerlink" href="#cmdoption-p" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the project the new clone will be used for</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-t">
+<tt class="descname">-t</tt><tt class="descclassname"> &lt;tag name&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--tag</tt><tt class="descclassname"> &lt;tag name&gt;</tt><a class="headerlink" href="#cmdoption-t" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the tag for the project the clone wil be used for.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-c">
+<tt class="descname">-c</tt><tt class="descclassname"> &lt;src channel</tt><tt class="descclassname">, </tt><tt class="descname">--channel</tt><tt class="descclassname"> &lt;src channel&gt;</tt><a class="headerlink" href="#cmdoption-c" title="Permalink to this definition">¶</a></dt>
+<dd><p>The channel to clone. This is optional if a default base
+channel is defined in the <em class="xref std std-ref">config</em></p>
+</dd></dl>
+
+<p>This allows simple cloning of channels without having to specify whole channel
+names which can quickly get unweildy.</p>
+<p>eg:</p>
+<p>Assuming we&#8217;re working on project GOON, and a new feature has been added,
+Minion,  which needs testing. This testing may require different versions of
+php, apache etc to other projects in place and so will need a seperate channel
+on spacewalk. by calling:</p>
+<div class="highlight-python"><pre>houston channel clone -p GOON -t minion -c &lt;orig channel&gt;</pre>
+</div>
+<p>a new channel will be created named <em>dev-GOON-&lt;mon&gt;-minion-&lt;orig&gt;</em> where &lt;mon&gt;
+is the short month eg, jan, feb etc and orig is the name of the channel used as
+the source of the clone.</p>
+<p>Clone will allways prepend the channel name with dev as any other environments
+eg qa staging should be generated using <a class="reference internal" href="#cli-channel-rollout"><em>Rollout</em></a> as this will
+keep any changes in the dev channel consistent.</p>
+<p>If the origional channel has any child channels, these child channels will be
+cloned as well.</p>
+</div>
+<div class="section" id="delete">
+<span id="cli-channel-delete"></span><h3>delete<a class="headerlink" href="#delete" title="Permalink to this headline">¶</a></h3>
+<p>The delete subcommand will remove a channel from spacewalk entirely. Do not
+pass GO, do not collect £200.</p>
+<p>Options:</p>
+<dl class="option">
+<dt id="cmdoption-c">
+<tt class="descname">-c</tt><tt class="descclassname"> &lt;channel&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--channel</tt><tt class="descclassname"> &lt;channel&gt;</tt><a class="headerlink" href="#cmdoption-c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Channel To delete</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-r">
+<tt class="descname">-r</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--recursive</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-r" title="Permalink to this definition">¶</a></dt>
+<dd><p>If provided the recursive flag will tell spacewalk to delete any children
+of &lt;channel&gt;</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-m">
+<tt class="descname">-m</tt><tt class="descclassname"> &lt;dst channel&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--migrate</tt><tt class="descclassname"> &lt;dst channel&gt;</tt><a class="headerlink" href="#cmdoption-m" title="Permalink to this definition">¶</a></dt>
+<dd><p>If provided any systems registered to channel will be migrated to &lt;dst
+channel&gt; first.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption--delete-systems">
+<tt class="descname">--delete-systems</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--delete-systems" title="Permalink to this definition">¶</a></dt>
+<dd><p>If provided any systems registered with &lt;channel&gt; will be removed from
+spacewalk first.</p>
+</dd></dl>
+
+<p>If neither -m or &#8211;delete-systems are provided then any systems subscribed to
+the channels will be orphaned.</p>
+</div>
+<div class="section" id="migrate">
+<span id="cli-channel-migrate"></span><h3>Migrate<a class="headerlink" href="#migrate" title="Permalink to this headline">¶</a></h3>
+<p>The Migrate option will unregister systems from one channel and re-subscribe
+them to another.</p>
+<p>Options:</p>
+<dl class="option">
+<dt id="cmdoption-f">
+<tt class="descname">-f</tt><tt class="descclassname"> &lt;src channel&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--from-channel</tt><tt class="descclassname"> &lt;src channel&gt;</tt><a class="headerlink" href="#cmdoption-f" title="Permalink to this definition">¶</a></dt>
+<dd><p>Channel whoses systems must be migrated.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-t">
+<tt class="descname">-t</tt><tt class="descclassname"> &lt;dst channel&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--to-channel</tt><tt class="descclassname"> &lt;dst channel&gt;</tt><a class="headerlink" href="#cmdoption-t" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base channel systems will be re-subscribed to</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-r">
+<tt class="descname">-r</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--recursive</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-r" title="Permalink to this definition">¶</a></dt>
+<dd><p>if &lt;dst channel&gt; has any children, and the recursive flag is provided then
+the systems will also be registered to the children.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-S">
+<tt class="descname">-S</tt><tt class="descclassname"> &lt;id[,id]&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--systems</tt><tt class="descclassname"> &lt;id[, id]&gt;</tt><a class="headerlink" href="#cmdoption-S" title="Permalink to this definition">¶</a></dt>
+<dd><p>if provided then only systems with an id in the comma seperated list will
+be migrated.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-D">
+<tt class="descname">-D</tt><tt class="descclassname"></tt><tt class="descclassname">, </tt><tt class="descname">--downgrade</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption-D" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the systems end up with any RPMs with a version higher than that
+available in the new channel then this option will force them to downgrade.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption--no-upgrade">
+<tt class="descname">--no-upgrade</tt><tt class="descclassname"></tt><a class="headerlink" href="#cmdoption--no-upgrade" title="Permalink to this definition">¶</a></dt>
+<dd><p>If specified then systems will not attempt to upgrade when registered to
+the new channels.</p>
+</dd></dl>
+
+<p>All the systems, or systems with id in list of ids, will be migrated from src
+channel to sdt channel.</p>
+</div>
+<div class="section" id="rollout">
+<span id="cli-channel-rollout"></span><h3>Rollout<a class="headerlink" href="#rollout" title="Permalink to this headline">¶</a></h3>
+<p>The Rollout command will allow transitions from one stage of development to the
+next.</p>
+<dl class="option">
+<dt id="cmdoption-c">
+<tt class="descname">-c</tt><tt class="descclassname"> &lt;channel&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--channel</tt><tt class="descclassname"> &lt;channel&gt;</tt><a class="headerlink" href="#cmdoption-c" title="Permalink to this definition">¶</a></dt>
+<dd><p>The channel that we will be rolling out from.</p>
+</dd></dl>
+
+<p>Rollouts allow customisation of a project channel, and have that customisation
+follow the project through dev, qa and staging environments through to
+production. This is usefull if development starts with the latest version of a
+package but needs to be rolled back to the previous version. Instead of having
+to do complex channel diff&#8217;s and manual changes to the qa/stage and production
+channels the Rollout will automatically keep the states of dev and qa the same
+and so forth.</p>
+<p>By default rollout will move from dev -&gt; qa -&gt; stage -&gt; prod however this can
+be customised in <em class="xref std std-ref">config</em>.</p>
+</div>
+</div>
+<div class="section" id="package-commands">
+<span id="cli-pkg-commands"></span><h2>Package Commands<a class="headerlink" href="#package-commands" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><ul class="simple">
+<li><a class="reference internal" href="#cli-pkg-remove"><em>Remove</em></a></li>
+<li><a class="reference internal" href="#cli-pkg-add"><em>Add</em></a></li>
+</ul>
+</div></blockquote>
+<p>Specifying a package to use:</p>
+<p>All the package commands require a Package Specification. this is how Houston
+knows which package to work with for that particular sub-command.</p>
+<p>Unfortunately the <cite>Spacewalk API</cite> is not very good at this. We are left with
+two choices either specify explicitly the name version release and arch of the
+package we want to deal with or use a <cite>lucerne query</cite> if we are missing any of
+these.</p>
+<p>So Houston can take either a <cite>lucerne query</cite> constructed by the user <strong>OR</strong> the
+user can specify the name of the package, and optionally the version, relelease
+and epoch. ( The arch is determined by the channel the search is restricted
+to.)</p>
+<p>If mulitple packages match the specification provided then Houston will provide
+a list to choose from.</p>
+<dl class="option">
+<dt id="cmdoption-q">
+<tt class="descname">-q</tt><tt class="descclassname"> &lt;query&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--query</tt><tt class="descclassname"> &lt;query&gt;</tt><a class="headerlink" href="#cmdoption-q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Standard <cite>lucerne query</cite> to use.</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-n">
+<tt class="descname">-n</tt><tt class="descclassname"> &lt;name&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--name</tt><tt class="descclassname"> &lt;name&gt;</tt><a class="headerlink" href="#cmdoption-n" title="Permalink to this definition">¶</a></dt>
+<dd><p>Name of package</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-v">
+<tt class="descname">-v</tt><tt class="descclassname"> &lt;version&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--version</tt><tt class="descclassname"> &lt;version&gt;</tt><a class="headerlink" href="#cmdoption-v" title="Permalink to this definition">¶</a></dt>
+<dd><p>Version of package</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-r">
+<tt class="descname">-r</tt><tt class="descclassname"> &lt;release&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--release</tt><tt class="descclassname"> &lt;release&gt;</tt><a class="headerlink" href="#cmdoption-r" title="Permalink to this definition">¶</a></dt>
+<dd><p>Release of package to use</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-e">
+<tt class="descname">-e</tt><tt class="descclassname"> &lt;epoch&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--epoch</tt><tt class="descclassname"> &lt;epoch&gt;</tt><a class="headerlink" href="#cmdoption-e" title="Permalink to this definition">¶</a></dt>
+<dd><p>Epoch of package to use</p>
+</dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-c">
+<tt class="descname">-c</tt><tt class="descclassname"> &lt;channel&gt;</tt><tt class="descclassname">, </tt><tt class="descname">--channel</tt><tt class="descclassname"> &lt;channel&gt;</tt><a class="headerlink" href="#cmdoption-c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Channel to restrict search to.</p>
+</dd></dl>
+
+<div class="section" id="remove">
+<span id="cli-pkg-remove"></span><h3>Remove<a class="headerlink" href="#remove" title="Permalink to this headline">¶</a></h3>
+<p>This removes the package from the given channel.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This Does <strong>NOT</strong> remove the package from the spacewalk server. It merely
+removes the link to the specified channel.</p>
+</div>
+</div>
+<div class="section" id="add">
+<span id="cli-pkg-add"></span><h3>Add<a class="headerlink" href="#add" title="Permalink to this headline">¶</a></h3>
+<p>Adds the specified package to the channel specified</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">This does <strong>not</strong> new pacakges to the spacewalk server, it merely links an
+existing package into the given channel. the package must already have been
+added either through rhn_push, reposync or similar process.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Command line usage</a></li>
+<li><a class="reference internal" href="#commands">Commands:</a><ul>
+<li><a class="reference internal" href="#channel">channel</a><ul>
+<li><a class="reference internal" href="#clone">clone</a></li>
+<li><a class="reference internal" href="#delete">delete</a></li>
+<li><a class="reference internal" href="#migrate">Migrate</a></li>
+<li><a class="reference internal" href="#rollout">Rollout</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#package-commands">Package Commands</a><ul>
+<li><a class="reference internal" href="#remove">Remove</a></li>
+<li><a class="reference internal" href="#add">Add</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Houston&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cli_usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Houston’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Houston 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Pete &#34;Peteches&#34; McCabe.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

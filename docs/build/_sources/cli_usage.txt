@@ -1,0 +1,85 @@
+.. cli_usage::
+Command line usage
+*******************
+
+Houston cli is an easy and convienient way to manage your spacewalk / satellite
+Server. It allows you to do complex time coonsuming tasks quickly and easily
+such as cloning whole channel groups, adding and removing packages from your
+channels having any subscribed systems downgrade their installed versions to
+match.
+
+This is still a work in progress but new features will be added as they are
+coded.
+
+Usage:::
+
+   houston [general options] COMMAND <command options>
+
+General options are:::
+
+    -s | --serverurl
+        This is the url of the spacewalk / satellite server to connect to.
+        Although this argument is optional if it is omitted it must be found in
+        the configuration file. See `config` for more details.
+
+    -u | --username
+        This is the username to authenticate with. Again if ommited it must be
+        present in the configuration file. See `config` for more details.
+
+    --version
+        version of houston being invoked.
+
+
+In addition a password is required to successfully authenticate against the
+spacewalk server. If this is not found in the `config` file then houston will
+prompt the user for a password if it is able. Otherwise houston will abort.
+
+.. cli_commands::
+Commands:
+=========
+
+.. cli_channel_commmands::
+channel
+-------
+
+The Channel commands all relate to tasks involving channels. These will be
+expanded upon.
+
+Channel commands available:::
+    clone
+    delete
+    migrate
+
+.. cli_channel_clone::
+clone
+^^^^^
+
+The clone subcommand will take a base channel and clone it using a specific
+nameing scheme.
+
+.. option:: -p --project
+    The name of the project the new clone will be used for
+
+.. option:: -t --tag
+    The name of the tag for the project the clone wil be used for.
+
+
+This allows simple cloning of channels without having to specify whole channel
+names which can quickly get unweildy.
+
+eg:
+
+Assuming we're working on project GOON, and a new feature has been added,
+Minion,  which needs testing. This testeing may require different versinos of
+php, apache etc to other projects in place and so will need a seperate channel
+on spacewalk. by calling:::
+
+    houston channel clone -p GOON -t minion --src <orig channel>
+
+a new channel will be created named *dev-GOON-<mon>-minion-<orig>* where <mon>
+is the short month eg, jan, feb etc and orig is the name of the channel used as
+the source of the clone.
+
+Clone will allway prepend the channel name with dev as any other environments
+eg qa staging should be generated using :ref:`rollout <cli_channnel_rollout>`
+as this will keep any changes from the dev channel consistent.

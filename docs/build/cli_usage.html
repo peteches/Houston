@@ -1,0 +1,191 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Command line usage &mdash; Houston 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Houston 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Welcome to Houston’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Houston’s documentation!"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">Houston 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="command-line-usage">
+<h1>Command line usage<a class="headerlink" href="#command-line-usage" title="Permalink to this headline">¶</a></h1>
+<p>Houston cli is an easy and convienient way to manage your spacewalk / satellite
+Server. It allows you to do complex time coonsuming tasks quickly and easily
+such as cloning whole channel groups, adding and removing packages from your
+channels having any subscribed systems downgrade their installed versions to
+match.</p>
+<p>This is still a work in progress but new features will be added as they are
+coded.</p>
+<p>Usage::</p>
+<div class="highlight-python"><pre>houston [general options] COMMAND &lt;command options&gt;</pre>
+</div>
+<p>General options are::</p>
+<div class="highlight-python"><pre>-s | --serverurl
+    This is the url of the spacewalk / satellite server to connect to.
+    Although this argument is optional if it is omitted it must be found in
+    the configuration file. See `config` for more details.
+
+-u | --username
+    This is the username to authenticate with. Again if ommited it must be
+    present in the configuration file. See `config` for more details.
+
+--version
+    version of houston being invoked.</pre>
+</div>
+<p>In addition a password is required to successfully authenticate against the
+spacewalk server. If this is not found in the <cite>config</cite> file then houston will
+prompt the user for a password if it is able. Otherwise houston will abort.</p>
+<div class="section" id="commands">
+<h2>Commands:<a class="headerlink" href="#commands" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="channel">
+<h3>channel<a class="headerlink" href="#channel" title="Permalink to this headline">¶</a></h3>
+<p>The Channel commands all relate to tasks involving channels. These will be
+expanded upon.</p>
+<dl class="docutils">
+<dt>Channel commands available:::</dt>
+<dd>clone
+delete
+migrate</dd>
+</dl>
+<div class="section" id="clone">
+<h4>clone<a class="headerlink" href="#clone" title="Permalink to this headline">¶</a></h4>
+<p>The clone subcommand will take a base channel and clone it using a specific
+nameing scheme.</p>
+<dl class="option">
+<dt id="cmdoption-p">
+<tt class="descname">-p</tt><tt class="descclassname"> --project</tt><a class="headerlink" href="#cmdoption-p" title="Permalink to this definition">¶</a></dt>
+<dt>
+<tt class="descname">The name of the project the new clone will be used for</tt></dt>
+<dd></dd></dl>
+
+<dl class="option">
+<dt id="cmdoption-t">
+<tt class="descname">-t</tt><tt class="descclassname"> --tag</tt><a class="headerlink" href="#cmdoption-t" title="Permalink to this definition">¶</a></dt>
+<dt>
+<tt class="descname">The name of the tag for the project the clone wil be used for.</tt></dt>
+<dd></dd></dl>
+
+<p>This allows simple cloning of channels without having to specify whole channel
+names which can quickly get unweildy.</p>
+<p>eg:</p>
+<p>Assuming we&#8217;re working on project GOON, and a new feature has been added,
+Minion,  which needs testing. This testeing may require different versinos of
+php, apache etc to other projects in place and so will need a seperate channel
+on spacewalk. by calling::</p>
+<div class="highlight-python"><pre>houston channel clone -p GOON -t minion --src &lt;orig channel&gt;</pre>
+</div>
+<p>a new channel will be created named <em>dev-GOON-&lt;mon&gt;-minion-&lt;orig&gt;</em> where &lt;mon&gt;
+is the short month eg, jan, feb etc and orig is the name of the channel used as
+the source of the clone.</p>
+<p>Clone will allway prepend the channel name with dev as any other environments
+eg qa staging should be generated using <em class="xref std std-ref">rollout</em>
+as this will keep any changes from the dev channel consistent.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Command line usage</a><ul>
+<li><a class="reference internal" href="#commands">Commands:</a><ul>
+<li><a class="reference internal" href="#channel">channel</a><ul>
+<li><a class="reference internal" href="#clone">clone</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">Welcome to Houston&#8217;s documentation!</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/cli_usage.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="index.html" title="Welcome to Houston’s documentation!"
+             >previous</a> |</li>
+        <li><a href="index.html">Houston 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Pete &#34;Peteches&#34; McCabe.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
