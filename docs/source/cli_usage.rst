@@ -167,6 +167,7 @@ Options:
     if provided then only systems with an id in the comma seperated list will
     be migrated.
 
+.. todo::
 .. option:: -D, --downgrade
 
     If the systems end up with any RPMs with a version higher than that

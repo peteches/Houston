@@ -1,0 +1,491 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>&lt;no title&gt; &mdash; Houston 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Houston 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Houston 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <span class="target" id="module-Houston.libhouston"></span><p>Houston Library</p>
+<dl class="class">
+<dt id="Houston.libhouston.Channel">
+<em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">Channel</tt><big>(</big><em>label</em>, <em>spw</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representing the state of a channel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>label</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Label of Channel to represent</li>
+<li><strong>spw</strong> &#8211; <a class="reference internal" href="#Houston.libhouston.Spacewalk" title="Houston.libhouston.Spacewalk"><tt class="xref py py-class docutils literal"><span class="pre">Spacewalk</span></tt></a> object</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#Houston.libhouston.Channel" title="Houston.libhouston.Channel"><tt class="xref py py-class docutils literal"><span class="pre">Channel</span></tt></a> instance</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="#Houston.libhouston.Channel" title="Houston.libhouston.Channel"><tt class="xref py py-class docutils literal"><span class="pre">Channel</span></tt></a> object is the workhorse for any channel related calls.</p>
+<p><a class="reference internal" href="#Houston.libhouston.Channel" title="Houston.libhouston.Channel"><tt class="xref py py-class docutils literal"><span class="pre">Channel</span></tt></a> is a dictionary like object that is intended to provide
+simple fast access to the relevant details about the channel.</p>
+<p>keys:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><cite>int</cite> - <strong>id</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>name</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>label</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>arch_name</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>summary</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>description</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>checksum_label</strong></p>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> - <strong>last_modified</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>maintainer_name</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>maintainer_email</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>maintainer_phone</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>support_policy</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>gpg_key_url</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>gpg_key_id</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>gpg_key_fp</strong></p>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> - yum repo_last_sync (optional)</p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>end_of_life</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>parent_channel_label</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>clone_original</strong></p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>repos</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite> - <strong>id</strong></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>all_packages</strong> All packages available in the channel</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>pkgid</cite>:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> object</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>latest_packages</strong> Latest versions of packages in the channel</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>pkgid</cite>:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> object</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>older_packages</strong> Older versions of packages in the channel</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>int</cite> <strong>pkgid</strong>:</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> object</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>bool</cite> - <strong>globally_subscribable</strong> Whether anyone can register to the channel</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>children</strong>  channels who are children of the channel</dt>
+<dd><ul class="first last simple">
+<li><a class="reference internal" href="#Houston.libhouston.Channel" title="Houston.libhouston.Channel"><tt class="xref py py-class docutils literal"><span class="pre">Channel</span></tt></a> object</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>errata</strong> all errata assigned to the channel</dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite> <strong>id</strong> - Errata ID.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<dl class="method">
+<dt id="Houston.libhouston.Channel.add_pkg">
+<tt class="descname">add_pkg</tt><big>(</big><em>pkgids</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.add_pkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.add_pkg" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adds packages to the given channels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pkgids</strong> (<em>list of ints</em>) &#8211; Package id&#8217;s to add to channels</li>
+<li><strong>channels)</strong> (<em>list of strings</em>) &#8211; Channel labels of channels to add packages to</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Bool</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="Houston.libhouston.Channel.clone">
+<tt class="descname">clone</tt><big>(</big><em>new_channel</em>, <em>state=True</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.clone" title="Permalink to this definition">¶</a></dt>
+<dd><p>clones channel using new_channel params</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>channel</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; channel to clone</li>
+<li><strong>new_channel</strong> (<em>Dict</em>) &#8211; channel details for the clone</li>
+<li><strong>state</strong> (<em>Boolean</em>) &#8211; keep Original state.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Bool</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="Houston.libhouston.Channel.delete">
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>deletes specified channel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> &#8211; Channel to remove.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Houston.libhouston.PKG">
+<em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">PKG</tt><big>(</big><em>pkgid</em>, <em>spw</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#PKG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.PKG" title="Permalink to this definition">¶</a></dt>
+<dd><p>OO representation of an RPM.</p>
+<p>This module intends to instantiate an object that can be used as if it
+was an rpm and interface with the rhn server.</p>
+<dl class="method">
+<dt id="Houston.libhouston.PKG.dependends_on_me">
+<tt class="descname">dependends_on_me</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.PKG.dependends_on_me" title="Permalink to this definition">¶</a></dt>
+<dd><p>removes pkg from the channel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> &#8211; channel to find deps in</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of <a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> objects</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Houston.libhouston.Spacewalk">
+<em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">Spacewalk</tt><big>(</big><em>server=None</em>, <em>user=None</em>, <em>password=None</em>, <em>verbose=False</em>, <em>conf='/home/peteches/.spw_conf'</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk" title="Permalink to this definition">¶</a></dt>
+<dd><p>parent Class for interacting with Spacewalk</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>server</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Spacewalk Server to login to</li>
+<li><strong>user</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; username to login with</li>
+<li><strong>password</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; password to use to log in with.</li>
+<li><strong>verbose</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; whether to use verbose xmlrpc connection.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>The <a class="reference internal" href="#Houston.libhouston.Spacewalk" title="Houston.libhouston.Spacewalk"><tt class="xref py py-class docutils literal"><span class="pre">Spacewalk</span></tt></a> Object opens a connection to the spacewalk server,
+using <a class="reference external" href="https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/chap-auth.html#sect-auth-login">auth</a> method with the connection details provided. If it has access
+to a tty it will prompt the user if any details are missing.</p>
+<p>Can be used as a context manager, in which case it will log out of the
+session during __exit__(). If instantiated manually then this will also
+need to be done manually.  For security&#8217;s sake using spacewalk as a context
+manager is best.</p>
+<p>There are several useful generic Methods for interacting with the Spacewalk
+server, but most of the grunt work is done by Namespaced classes.</p>
+<dl class="method">
+<dt id="Houston.libhouston.Spacewalk.api_call">
+<tt class="descname">api_call</tt><big>(</big><em>namespace</em>, <em>method</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.api_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.api_call" title="Permalink to this definition">¶</a></dt>
+<dd><p>Makes RPC call to the server.</p>
+<p>The session key will be automatically added, any other arguments must
+be supplied.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>namespace</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Namespace of the method to call</li>
+<li><strong>method</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; Method to call</li>
+<li><strong>*args</strong> &#8211; any arguments to pass to api call</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">result of api call</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="Houston.libhouston.Spacewalk.channel_exists">
+<tt class="descname">channel_exists</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Spacewalk.channel_exists" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks to see if channel exists.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; channel label to check</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Boolean</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="Houston.libhouston.Spacewalk.lucerne_query">
+<tt class="descname">lucerne_query</tt><big>(</big><em>query</em>, <em>channels=None</em>, <em>keys=None</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.lucerne_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.lucerne_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>runs lucerne query on the spacewalk server</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>query</strong> (<a class="reference external" href="http://docs.python.org/library/string.html#string" title="(in Python v2.7)"><em>string</em></a>) &#8211; lucernce query</li>
+<li><strong>channels</strong> (<em>list of channel labels</em>) &#8211; channel label to run search agains (opt)</li>
+<li><strong>keys</strong> (<em>list of activation keys</em>) &#8211; activation key to run search against.(opt)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul>
+<li><p class="first"><cite>list</cite>:</p>
+<blockquote>
+<div><ul>
+<li><p class="first"><cite>dict</cite> - package overview</p>
+<blockquote>
+<div><ul class="simple">
+<li><cite>int</cite> - id</li>
+<li><cite>str</cite> - name</li>
+<li><cite>str</cite> - summary</li>
+<li><cite>str</cite> - description</li>
+<li><cite>str</cite> - version</li>
+<li><cite>str</cite> - release</li>
+<li><cite>str</cite> - arch</li>
+<li><cite>str</cite> - epoch</li>
+<li><cite>str</cite> - provider</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<p>runs the <a href="#id1"><span class="problematic" id="id2">`lucerne query`_</span></a> provided and returns a list of dicts with
+the keys above.</p>
+<p>If any channels or activation keys are supplied then the
+query is run against each one in turn ( using appropriate
+rpc calls e.g. <a class="reference external" href="https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-packages_search-advancedWithActKey.html">advanced_with_act_key</a> or <a class="reference external" href="https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-packages_search-advancedWithChannel.html">advanced_with_channel</a> )
+Then the results of each call are merged, de-duplicated and returned.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="Houston.libhouston.Spacewalk.subscribe_base_channel">
+<tt class="descname">subscribe_base_channel</tt><big>(</big><em>systemid</em>, <em>channel</em>, <em>recurse</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.subscribe_base_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.subscribe_base_channel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Subscribes system (systemid) to base channel (channel).</p>
+<p>This will also determine all allowed child channels the system
+can be subscribed to and subscribe it to them.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>systemids</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#list" title="(in Python v2.7)"><em>list</em></a>) &#8211; list of spacewalk system ids</li>
+<li><strong>channel</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; channel label of base channel to subscribe to</li>
+<li><strong>recurse</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; subscribe to children of &lt;channel&gt;</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Boolean</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="Houston.libhouston.SpacewalkAPIError">
+<em class="property">exception </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">SpacewalkAPIError</tt><a class="reference internal" href="_modules/Houston/libhouston.html#SpacewalkAPIError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.SpacewalkAPIError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Any API related Exceptions</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Houston.libhouston.SpacewalkChannelNotFound">
+<em class="property">exception </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">SpacewalkChannelNotFound</tt><a class="reference internal" href="_modules/Houston/libhouston.html#SpacewalkChannelNotFound"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.SpacewalkChannelNotFound" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception for channel based exceptions.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Houston.libhouston.SpacewalkError">
+<em class="property">exception </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">SpacewalkError</tt><a class="reference internal" href="_modules/Houston/libhouston.html#SpacewalkError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.SpacewalkError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Base Exception for Spacewalk Module</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Houston.libhouston.SpacewalkInvalidCredentials">
+<em class="property">exception </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">SpacewalkInvalidCredentials</tt><a class="reference internal" href="_modules/Houston/libhouston.html#SpacewalkInvalidCredentials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.SpacewalkInvalidCredentials" title="Permalink to this definition">¶</a></dt>
+<dd><p>Exception to raise for any invalid credentials</p>
+</dd></dl>
+
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/Houstonlib.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="index.html">Houston 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Pete &#34;Peteches&#34; McCabe.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

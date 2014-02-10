@@ -1,0 +1,802 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Houston.libhouston &mdash; Houston 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Houston 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Houston 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for Houston.libhouston</h1><div class="highlight"><pre>
+<span class="sd">&#39;&#39;&#39;Spacewalk abstraction module.</span>
+
+<span class="sd">Can be used as a context manager, in which case it will log out of the session</span>
+<span class="sd">during __exit__(). If instantiated manually then this will also need to be done</span>
+<span class="sd">manually.  For security&#39;s sake using spacewalk as a context manager is best.</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">xmlrpc.client</span>
+<span class="kn">import</span> <span class="nn">configparser</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_from_camel_case</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Converts CamelCase string to camel_case.</span>
+
+<span class="sd">    *Note* this function will also lowercase the *WHOLE* string</span>
+
+<span class="sd">    :param name: CamelCase String</span>
+<span class="sd">    :type name: str</span>
+<span class="sd">    :returns: str</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r&#39;([A-Z])&#39;</span><span class="p">,</span> <span class="s">r&#39;_\1&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_convert_label_to_list</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Converts string version or release into a list of it&#39;s constituent</span>
+<span class="sd">    parts.</span>
+
+<span class="sd">    :param arg1: @todo</span>
+<span class="sd">    :type arg1: @todo</span>
+<span class="sd">    :returns: @todo</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="n">label</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">r&#39;([0-9]+|[A-Za-z]+)(?=)&#39;</span><span class="p">,</span> <span class="s">r&#39;\1@&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+    <span class="n">label</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">r&#39;[^A-Za-z0-9]+&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">label</span>
+
+
+<div class="viewcode-block" id="SpacewalkError"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.SpacewalkError">[docs]</a><span class="k">class</span> <span class="nc">SpacewalkError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Base Exception for Spacewalk Module</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="SpacewalkChannelNotFound"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.SpacewalkChannelNotFound">[docs]</a><span class="k">class</span> <span class="nc">SpacewalkChannelNotFound</span><span class="p">(</span><span class="n">SpacewalkError</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Exception for channel based exceptions.</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="SpacewalkInvalidCredentials"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.SpacewalkInvalidCredentials">[docs]</a><span class="k">class</span> <span class="nc">SpacewalkInvalidCredentials</span><span class="p">(</span><span class="n">SpacewalkError</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Exception to raise for any invalid credentials</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="SpacewalkAPIError"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.SpacewalkAPIError">[docs]</a><span class="k">class</span> <span class="nc">SpacewalkAPIError</span><span class="p">(</span><span class="n">SpacewalkError</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Any API related Exceptions</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">pass</span>
+
+</div>
+<div class="viewcode-block" id="Spacewalk"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Spacewalk">[docs]</a><span class="k">class</span> <span class="nc">Spacewalk</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;parent Class for interacting with Spacewalk&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">user</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                 <span class="n">conf</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s">&#39;~/.spw_conf&#39;</span><span class="p">)):</span>
+        <span class="sd">&#39;&#39;&#39;initialises variables and connection to spacewalk.</span>
+
+<span class="sd">        :param server: Spacewalk Server to login to</span>
+<span class="sd">        :param user: username to login with</span>
+<span class="sd">        :param password: password to use to log in with.</span>
+<span class="sd">        :param verbose: whether to use verbose xmlrpc connection.</span>
+
+<span class="sd">        .. Redhat Docs: https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/chap-auth.html#sect-auth-login</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="n">verbose</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_collect_spw_details</span><span class="p">(</span><span class="n">server</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">conf</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">SpacewalkInvalidCredentials</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;http&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="s">&#39;https://{}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">&#39;^https://&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">):</span>
+            <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s">&#39;http://&#39;</span><span class="p">,</span> <span class="s">&#39;https://&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s">&#39;/rpc/api&#39;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="s">&quot;/&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span> <span class="s">&#39;rpc&#39;</span><span class="p">,</span> <span class="s">&#39;api&#39;</span><span class="p">])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_client</span> <span class="o">=</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Server</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">server</span><span class="p">,</span>
+                                            <span class="n">verbose</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">auth</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+
+        <span class="n">calls</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;_&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">y</span> <span class="ow">in</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">_client</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">get_api_call_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+                 <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">y</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+        <span class="n">calls_alt</span> <span class="o">=</span> <span class="p">[</span><span class="n">_convert_from_camel_case</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">calls</span><span class="p">]</span>
+
+        <span class="c"># this call list allows check valid calls so no invalid callsl can</span>
+        <span class="c"># be made</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api_calllist</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">calls</span><span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">calls_alt</span><span class="p">)</span>
+        <span class="c"># don&#39;t  need password now so lets get rid of it.</span>
+        <span class="k">del</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">password</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_collect_spw_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">server</span><span class="p">,</span> <span class="n">user</span><span class="p">,</span> <span class="n">password</span><span class="p">,</span> <span class="n">conf</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;sets login details for the spacewalk server from config or</span>
+<span class="sd">        initiates the prompt functions.</span>
+
+<span class="sd">        :param server: Server to connect to</span>
+<span class="sd">        :param user: user to login as</span>
+<span class="sd">        :param password: password to use</span>
+<span class="sd">        :param conf: Configuration file path</span>
+<span class="sd">        :returns: Boolean</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+        <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">conf</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">server</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;auth&#39;</span><span class="p">][</span><span class="s">&#39;server&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_server</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">server</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">server</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;auth&#39;</span><span class="p">][</span><span class="s">&#39;server&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">user</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;auth&#39;</span><span class="p">][</span><span class="s">&#39;user&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_user</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">user</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;auth&#39;</span><span class="p">][</span><span class="s">&#39;user&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">password</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;auth&#39;</span><span class="p">][</span><span class="s">&#39;password&#39;</span><span class="p">]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_password</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">password</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">password</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s">&#39;auth&#39;</span><span class="p">][</span><span class="s">&#39;password&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">password</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">server</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">return</span> <span class="bp">True</span>
+
+    <span class="k">def</span> <span class="nf">_prompt_for_input</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">detail</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;_prompt for input prompts user for some input and returns whats</span>
+<span class="sd">        given</span>
+
+<span class="sd">        :param detail: What to prompt the user for.</span>
+<span class="sd">        :returns: user input</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="n">SpacewalkError</span><span class="p">(</span><span class="s">&quot;Password not supplied.&quot;</span><span class="p">)</span>
+
+        <span class="n">prompt</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s">&#39;password&#39;</span><span class="p">:</span>
+            <span class="s">&quot;Please enter Password for {u}:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">u</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">),</span>
+            <span class="s">&#39;user&#39;</span><span class="p">:</span>
+            <span class="s">&quot;Please enter username:&quot;</span><span class="p">,</span>
+            <span class="s">&#39;server&#39;</span><span class="p">:</span>
+            <span class="s">&quot;Please enter spacewalk url&quot;</span><span class="p">,</span>
+        <span class="p">}</span>
+
+        <span class="kn">import</span> <span class="nn">termios</span>
+        <span class="n">fd</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">fileno</span><span class="p">()</span>
+        <span class="n">old</span> <span class="o">=</span> <span class="n">termios</span><span class="o">.</span><span class="n">tcgetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">termios</span><span class="o">.</span><span class="n">tcgetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">detail</span> <span class="o">==</span> <span class="s">&quot;password&quot;</span><span class="p">:</span>
+            <span class="n">new</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&amp;</span> <span class="o">~</span><span class="n">termios</span><span class="o">.</span><span class="n">ECHO</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">termios</span><span class="o">.</span><span class="n">tcsetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">termios</span><span class="o">.</span><span class="n">TCSADRAIN</span><span class="p">,</span> <span class="n">new</span><span class="p">)</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span><span class="n">prompt</span><span class="p">[</span><span class="n">detail</span><span class="p">])</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">termios</span><span class="o">.</span><span class="n">tcsetattr</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span> <span class="n">termios</span><span class="o">.</span><span class="n">TCSADRAIN</span><span class="p">,</span> <span class="n">old</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">retval</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Connects to and logs into a session on the spacewalk server</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_vl</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;exit the context manager</span>
+
+<span class="sd">        :param exc_type: exception Type</span>
+<span class="sd">        :param exc_vl: exception value</span>
+<span class="sd">        :param exc_tb: exception traceback</span>
+<span class="sd">        :returns: Depends</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="n">exc_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;auth&#39;</span><span class="p">,</span> <span class="s">&#39;logout&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_password</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Uses _prompt_for_input to prompt for password</span>
+<span class="sd">        :returns: password (str)</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_for_input</span><span class="p">(</span><span class="s">&#39;password&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_server</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;uses _prompt_for_input to prompt for server uri</span>
+<span class="sd">        :returns: server uri (str)</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_for_input</span><span class="p">(</span><span class="s">&#39;server&#39;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_user</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Uses _prompt_for_input to obtain user naem</span>
+<span class="sd">        :returns: user name (str)</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prompt_for_input</span><span class="p">(</span><span class="s">&#39;user&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Spacewalk.api_call"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Spacewalk.api_call">[docs]</a>    <span class="k">def</span> <span class="nf">api_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">,</span> <span class="n">method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Makes RPC call to the server.</span>
+
+<span class="sd">        The session key will be automatically added, any other arguments must</span>
+<span class="sd">        be supplied.</span>
+
+<span class="sd">        :param namespace: Namespace of the method to call</span>
+<span class="sd">        :type namespace: string</span>
+<span class="sd">        :param method: Method to call</span>
+<span class="sd">        :type method: string</span>
+<span class="sd">        :param \*args: any arguments to pass to api call</span>
+
+<span class="sd">        :returns: result of api call</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="n">api</span> <span class="o">=</span> <span class="s">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">namespace</span><span class="p">,</span> <span class="n">method</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">api</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_calllist</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpacewalkAPIError</span><span class="p">(</span><span class="s">&quot;No such Api Method: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">api</span><span class="p">))</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">eval</span><span class="p">(</span><span class="s">&#39;self._client.{api}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">api</span><span class="o">=</span><span class="n">api</span><span class="p">))(</span><span class="bp">self</span><span class="o">.</span><span class="n">_key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">xmlrpc</span><span class="o">.</span><span class="n">client</span><span class="o">.</span><span class="n">Fault</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpacewalkAPIError</span><span class="p">(</span><span class="s">&quot;RPC Fault while calling {call}{args}</span><span class="se">\n</span><span class="s">&quot;</span>
+                                    <span class="s">&quot;{err}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">call</span><span class="o">=</span><span class="n">api</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+                                                   <span class="n">err</span><span class="o">=</span><span class="n">e</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="Spacewalk.subscribe_base_channel"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Spacewalk.subscribe_base_channel">[docs]</a>    <span class="k">def</span> <span class="nf">subscribe_base_channel</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">systemid</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Subscribes system (systemid) to base channel (channel).</span>
+
+<span class="sd">        This will also determine all allowed child channels the system</span>
+<span class="sd">        can be subscribed to and subscribe it to them.</span>
+
+<span class="sd">        :param systemids: list of spacewalk system ids</span>
+<span class="sd">        :type systemids: list</span>
+<span class="sd">        :param channel: channel label of base channel to subscribe to</span>
+<span class="sd">        :type channel: str</span>
+<span class="sd">        :returns: Boolean</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">subs</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;system&#39;</span><span class="p">,</span> <span class="s">&#39;list_subscribable_base_channels&#39;</span><span class="p">,</span>
+                              <span class="n">systemid</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">channel</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpacewalkAPIError</span><span class="p">(</span><span class="s">&quot;Channel arg required&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel_exists</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">SpacewalkChannelNotFound</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">channel</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">subs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpacewalkAPIError</span><span class="p">(</span><span class="s">&quot;System cannot be subscribed to </span><span class="se">\</span>
+<span class="s">                                    {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">channel</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;system&#39;</span><span class="p">,</span> <span class="s">&#39;set_base_channel&#39;</span><span class="p">,</span> <span class="n">systemid</span><span class="p">,</span> <span class="n">channel</span><span class="p">)</span>
+
+        <span class="n">sub_chans</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                     <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;system&#39;</span><span class="p">,</span>
+                                   <span class="s">&#39;list_subscribable_child_channels&#39;</span><span class="p">,</span>
+                                   <span class="n">systemid</span><span class="p">)]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;system&#39;</span><span class="p">,</span> <span class="s">&#39;set_child_channels&#39;</span><span class="p">,</span> <span class="n">systemid</span><span class="p">,</span> <span class="n">sub_chans</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Spacewalk.lucerne_query"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Spacewalk.lucerne_query">[docs]</a>    <span class="k">def</span> <span class="nf">lucerne_query</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">channels</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">keys</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;runs lucerne query on the spacewalk server</span>
+
+<span class="sd">        :param query: lucernce query</span>
+<span class="sd">        :type query: string</span>
+<span class="sd">        :param channels: channel label to run search agains (opt)</span>
+<span class="sd">        :type channels: list of channel labels</span>
+<span class="sd">        :param keys: activation key to run search against.(opt)</span>
+<span class="sd">        :type keys: list of activation keys</span>
+<span class="sd">        :returns:</span>
+<span class="sd">            * _list_:</span>
+
+<span class="sd">                * _dict_ - package overview</span>
+
+<span class="sd">                    * *int* - id</span>
+<span class="sd">                    * *str* - name</span>
+<span class="sd">                    * *str* - summary</span>
+<span class="sd">                    * *str* - description</span>
+<span class="sd">                    * *str* - version</span>
+<span class="sd">                    * *str* - release</span>
+<span class="sd">                    * *str* - arch</span>
+<span class="sd">                    * *str* - epoch</span>
+<span class="sd">                    * *str* - provider</span>
+
+<span class="sd">        runs the lucerne query provided and returs a list of dicts with</span>
+<span class="sd">        the keys above.</span>
+
+<span class="sd">        If any channels or activation keys are supplied then the</span>
+<span class="sd">        query is run against each one in turn ( using appropriate</span>
+<span class="sd">        rpc calls e.g. `advanced_with_act_key` or `advanced_with_channel` )</span>
+<span class="sd">        Then the results of each call are merged, de-duplicated and returned.</span>
+
+<span class="sd">        .. `advanced_with_act_key`: https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-packages_search-advancedWithActKey.html</span>
+<span class="sd">        .. `advanced_with_channel`: https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-packages_search-advancedWithChannel.html</span>
+
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">channels</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">keys</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;packages.search&#39;</span><span class="p">,</span> <span class="s">&#39;advanced&#39;</span><span class="p">,</span> <span class="n">query</span><span class="p">)</span>
+
+        <span class="n">rv</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+                <span class="n">rv</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;packages.search&#39;</span><span class="p">,</span>
+                                        <span class="s">&#39;advanced_with_channel&#39;</span><span class="p">,</span>
+                                        <span class="n">query</span><span class="p">,</span> <span class="n">channel</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+                <span class="n">rv</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;packages.search&#39;</span><span class="p">,</span>
+                                        <span class="s">&#39;advanced_with_act_key&#39;</span><span class="p">,</span>
+                                        <span class="n">query</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">return</span> <span class="n">rv</span>
+
+</div></div>
+<div class="viewcode-block" id="Channel"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Channel">[docs]</a><span class="k">class</span> <span class="nc">Channel</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;Object representing the state of a channel&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">label</span><span class="p">,</span> <span class="n">spw</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Init  magic.&#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spw__</span> <span class="o">=</span> <span class="n">spw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ns</span> <span class="o">=</span> <span class="s">&#39;channel.software&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spw__</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span> <span class="s">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;get_details&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;globally_subscribable&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;is_globally_subscribable&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;pkgs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;list_all_packages&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;latest_pkgs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;list_latest_packages&#39;</span><span class="p">,</span>
+                                            <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;arches&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;list_arches&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;repos&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;list_channel_repos&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;children&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">Channel</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">spw</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                                 <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;list_children&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;errata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;list_errata&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;systems&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;list_subscribed_systems&#39;</span><span class="p">,</span>
+                                        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+
+<div class="viewcode-block" id="Channel.add_pkg"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Channel.add_pkg">[docs]</a>    <span class="k">def</span> <span class="nf">add_pkg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Adds packages to the given channels</span>
+
+<span class="sd">        :param pkgids: Package id&#39;s to add to channels</span>
+<span class="sd">        :type pkgids: list of ints</span>
+<span class="sd">        :param channels): Channel labels of channels to add packages to</span>
+<span class="sd">        :type channels): list of strings</span>
+<span class="sd">        :returns: Bool</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;add_packages&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">],</span> <span class="n">pkgids</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Channel.remove_pkg"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Channel.remove_pkg">[docs]</a>    <span class="k">def</span> <span class="nf">remove_pkg</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgids</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;removes pkg from either the channel specified</span>
+
+<span class="sd">        :param pkgids: ids to remove</span>
+<span class="sd">        :type pkgids: list of ints</span>
+<span class="sd">        :param channels: Channels to remove pkgs from</span>
+<span class="sd">        :type channels: list of strings</span>
+<span class="sd">        :param keys: Activation keys to remove pkgs from</span>
+<span class="sd">        :type key: list of strings</span>
+<span class="sd">        :returns: Boolean</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;remove_packages&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">],</span> <span class="n">pkgids</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="Channel.delete"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Channel.delete">[docs]</a>    <span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;deletes specified channel</span>
+
+<span class="sd">        :param channel: Channel to remove.</span>
+<span class="sd">        :returns: Boolean</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;delete&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpacewalkError</span><span class="p">(</span><span class="s">&quot;Error: Unable to remove channel </span><span class="se">\</span>
+<span class="s">                                 {c}: {err}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">],</span>
+                                                    <span class="n">err</span><span class="o">=</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">True</span>
+</div>
+<div class="viewcode-block" id="Channel.clone"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.Channel.clone">[docs]</a>    <span class="k">def</span> <span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;clones channel using new_channel params</span>
+
+<span class="sd">        :param channel: channel to clone</span>
+<span class="sd">        :type channel: string</span>
+<span class="sd">        :param new_channel: channel details for the clone</span>
+<span class="sd">        :type new_channel: Dict</span>
+<span class="sd">        :param state: keep Original state.</span>
+<span class="sd">        :type state: Boolean</span>
+
+<span class="sd">        .. See here:https://access.redhat.com/site/documentation/en-US/Red_Hat_Satellite/5.6/html/API_Overview/sect-channel_software-clone.html</span>
+
+<span class="sd">        :returns: Bool</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel_exists</span><span class="p">(</span><span class="n">new_channel</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">])</span>
+        <span class="k">except</span> <span class="n">SpacewalkChannelNotFound</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpacewalkError</span><span class="p">(</span><span class="s">&quot;Error: Channel allready &quot;</span>
+                                 <span class="s">&quot;exists: {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">new_channel</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">]))</span>
+
+        <span class="n">state</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api</span><span class="p">(</span><span class="s">&#39;clone&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;label&#39;</span><span class="p">],</span> <span class="n">new_channel</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SpacewalkError</span><span class="p">(</span><span class="s">&quot;Error: Unable to clone channel: {c}</span><span class="se">\n</span><span class="s">&quot;</span>
+                                 <span class="s">&quot;{err}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">c</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">],</span> <span class="n">err</span><span class="o">=</span><span class="n">e</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">ret</span>
+
+</div></div>
+<div class="viewcode-block" id="PKG"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.PKG">[docs]</a><span class="k">class</span> <span class="nc">PKG</span><span class="p">(</span><span class="n">collections</span><span class="o">.</span><span class="n">UserDict</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;OO representation of an RPM.</span>
+
+<span class="sd">    This module intends to instantiate an object that can be used as if it</span>
+<span class="sd">    was an rpm and interface with the rhn server.</span>
+
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">,</span> <span class="n">spw</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Sets up the RPM object with relevant details from spacewalk</span>
+
+<span class="sd">        :param pkgid: package to represent</span>
+<span class="sd">        :type pkgid: int</span>
+<span class="sd">        :param spw: :class:`Spacewalk` instance</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__NEWER__</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__OLDER__</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__spw__</span> <span class="o">=</span> <span class="n">spw</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ns</span> <span class="o">=</span> <span class="s">&#39;packages&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__spw__</span><span class="o">.</span><span class="n">api_call</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span> <span class="s">&#39;get_details&#39;</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;url&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span> <span class="s">&#39;get_package_url&#39;</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">)</span>
+
+        <span class="n">deps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span> <span class="s">&#39;list_dependencies&#39;</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;conflicts&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_modifier&#39;</span><span class="p">])</span>
+                                  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">deps</span>
+                                  <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;conflicts&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;obsoletes&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_modifier&#39;</span><span class="p">])</span>
+                                  <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">deps</span>
+                                  <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;obsoletes&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;provides&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_modifier&#39;</span><span class="p">])</span>
+                                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">deps</span>
+                                 <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;provides&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;requires&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_modifier&#39;</span><span class="p">])</span>
+                                 <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">deps</span>
+                                 <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;requires&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;files&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span> <span class="s">&#39;list_files&#39;</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span>
+                                              <span class="s">&#39;list_providing_channels&#39;</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;errata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span>
+                                            <span class="s">&#39;list_providing_errata&#39;</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;returns 1 if other newer, -1 if self newer 0 if identical&#39;&#39;&#39;</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">[</span><span class="s">&#39;version&#39;</span><span class="p">,</span> <span class="s">&#39;release&#39;</span><span class="p">]:</span>
+
+            <span class="n">l_self</span> <span class="o">=</span> <span class="n">_convert_label_to_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">l_other</span> <span class="o">=</span> <span class="n">_convert_label_to_list</span><span class="p">(</span><span class="n">other</span><span class="p">[</span><span class="n">label</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">label</span> <span class="o">==</span> <span class="s">&#39;version&#39;</span><span class="p">:</span>
+                    <span class="n">l_other</span> <span class="o">=</span> <span class="n">_convert_label_to_list</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="mi">0</span>
+
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_self</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_other</span><span class="p">):</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_self</span><span class="p">))</span>
+                <span class="n">shorter</span> <span class="o">=</span> <span class="p">(</span><span class="n">l_other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__NEWER__</span><span class="p">)</span>
+
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_self</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_other</span><span class="p">):</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_other</span><span class="p">))</span>
+                <span class="n">shorter</span> <span class="o">=</span> <span class="p">(</span><span class="n">l_self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__OLDER__</span><span class="p">)</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rng</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">l_self</span><span class="p">))</span>
+                <span class="n">shorter</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">rng</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">l_self</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">o</span> <span class="o">=</span> <span class="n">l_other</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+                <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_label_cmp__</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">retval</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">shorter</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shorter</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">shorter</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">retval</span>
+
+        <span class="k">return</span> <span class="mi">0</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="bp">False</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__OLDER__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__le__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__OLDER__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__NEWER__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">other</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> \
+                <span class="bp">self</span><span class="o">.</span><span class="n">__cmp__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__NEWER__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">_label_cmp__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">o</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;determines which is more current segment of version / release</span>
+
+<span class="sd">        :param s: @todo</span>
+<span class="sd">        :type s: @todo</span>
+<span class="sd">        :param o: @todo</span>
+<span class="sd">        :type o: @todo</span>
+<span class="sd">        :returns: @todo</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">retval</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">o</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__NEWER__</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">s</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__OLDER__</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span> <span class="ow">and</span> <span class="n">o</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__NEWER__</span>
+            <span class="k">elif</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="n">o</span><span class="p">):</span>
+                <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__OLDER__</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__NEWER__</span>
+        <span class="k">elif</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="n">o</span><span class="p">:</span>
+            <span class="n">retval</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__OLDER__</span>
+
+        <span class="k">return</span> <span class="n">retval</span>
+
+<div class="viewcode-block" id="PKG.pkg_what_depends"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.PKG.pkg_what_depends">[docs]</a>    <span class="k">def</span> <span class="nf">pkg_what_depends</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">,</span> <span class="n">channel</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Determines which packages depend on pkgid provided within</span>
+<span class="sd">        the specified channel</span>
+
+<span class="sd">        :param pkgid: pkgid to query</span>
+<span class="sd">        :type pkgid: int</span>
+<span class="sd">        :returns: list of tuples:</span>
+<span class="sd">            * list</span>
+
+<span class="sd">                * tuple</span>
+
+<span class="sd">                    * *int* - pkgid ( of dependant package)</span>
+<span class="sd">                    * *str* - the provides it was dependant on</span>
+<span class="sd">                    * *str* - Version dependant on</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="n">pkg_provides</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency&#39;</span><span class="p">]</span>
+                        <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span> <span class="s">&#39;list_dependencies&#39;</span><span class="p">,</span>
+                                               <span class="n">pkgid</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;provides&#39;</span><span class="p">]</span>
+
+        <span class="n">depends_on_pkg</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel_list_pkgs</span><span class="p">(</span><span class="n">channel</span><span class="p">):</span>
+            <span class="n">deps</span> <span class="o">=</span> <span class="p">[(</span><span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency&#39;</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_modifier&#39;</span><span class="p">])</span>
+                    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ns</span><span class="p">,</span> <span class="s">&#39;list_dependencies&#39;</span><span class="p">,</span> <span class="n">pkg</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="s">&#39;dependency_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&#39;requires&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">deps</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">provides</span> <span class="ow">in</span> <span class="n">pkg_provides</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">provides</span><span class="p">:</span>
+                        <span class="n">depends_on_pkg</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">pkg</span><span class="p">,</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                        <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">depends_on_pkg</span></div>
+<div class="viewcode-block" id="PKG.get_pkg_details"><a class="viewcode-back" href="../../Houstonlib.html#Houston.libhouston.PKG.get_pkg_details">[docs]</a>    <span class="k">def</span> <span class="nf">get_pkg_details</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;obtains details about given pakckage id</span>
+
+<span class="sd">        :param pkgid: id of package</span>
+<span class="sd">        :type pkgid: int</span>
+<span class="sd">        :returns: dict</span>
+<span class="sd">            * dict</span>
+
+<span class="sd">                * *int* id</span>
+<span class="sd">                * *str* name</span>
+<span class="sd">                * *str* epoch</span>
+<span class="sd">                * *str* version</span>
+<span class="sd">                * *str* release</span>
+<span class="sd">                * *str* arch_label</span>
+<span class="sd">                * array &quot;providing channels&quot;</span>
+
+<span class="sd">                    * *str* channel label providing this package</span>
+<span class="sd">                * *str* build_host</span>
+<span class="sd">                * *str* description</span>
+<span class="sd">                * *str* checksum</span>
+<span class="sd">                * *str* checksum_type</span>
+<span class="sd">                * *str* vendor</span>
+<span class="sd">                * *str* summary</span>
+<span class="sd">                * *str* cookie</span>
+<span class="sd">                * *str* license</span>
+<span class="sd">                * *str* file</span>
+<span class="sd">                * *str* build_date</span>
+<span class="sd">                * *str* last_modified_date</span>
+<span class="sd">                * *str* size</span>
+<span class="sd">                * *str* path - the path on the satellite servers file system</span>
+<span class="sd">                * *str* payload_size</span>
+
+<span class="sd">        &#39;&#39;&#39;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">api_call</span><span class="p">(</span><span class="s">&#39;packages&#39;</span><span class="p">,</span> <span class="s">&#39;get_details&#39;</span><span class="p">,</span> <span class="n">pkgid</span><span class="p">)</span>
+</pre></div></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">Houston 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Pete &#34;Peteches&#34; McCabe.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
