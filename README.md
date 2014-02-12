@@ -8,7 +8,9 @@ won't test it.
 tbh I've not tested against a RHN satellite server but Spacewalk and satellite
 share an API. Novel I suspect will have tampered with it a bit.
 
-Full documentation is in the doc dir, and will get hosted somewhere soon.
+Full documentation is in the doc dir, and is also available [here][docs]
+
+[docs]: http://houston.peteches.co.uk
 
 This is a work in progress and will take some time to be fully functional.
 
