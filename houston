@@ -6,9 +6,8 @@
 
 import sys
 import time
-sys.path.append('./')
-import Spacewalklib as Spacewalk
 import pprint
+from Houston.libhouston import *
 
 
 def clone(a):
@@ -18,7 +17,7 @@ def clone(a):
     :returns: Boolean
 
     '''
-    with Spacewalk.Spacewalk(a.serverurl, a.username) as spw:
+    with Spacewalk(a.serverurl, a.username) as spw:
 
         try:
             parent_details = spw.get_channel_details(a.channel)

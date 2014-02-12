@@ -73,98 +73,55 @@ simple fast access to the relevant details about the channel.</p>
 <p>keys:</p>
 <blockquote>
 <div><ul>
-<li><p class="first"><cite>int</cite> - <strong>id</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>name</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>label</strong></p>
-</li>
 <li><p class="first"><cite>string</cite> - <strong>arch_name</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>summary</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>description</strong></p>
 </li>
 <li><p class="first"><cite>string</cite> - <strong>checksum_label</strong></p>
 </li>
-<li><p class="first"><cite>dateTime.iso8601</cite> - <strong>last_modified</strong></p>
+<li><p class="first"><cite>string</cite> - <strong>clone_original</strong></p>
 </li>
-<li><p class="first"><cite>string</cite> - <strong>maintainer_name</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>maintainer_email</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>maintainer_phone</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>support_policy</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>gpg_key_url</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>gpg_key_id</strong></p>
-</li>
-<li><p class="first"><cite>string</cite> - <strong>gpg_key_fp</strong></p>
-</li>
-<li><p class="first"><cite>dateTime.iso8601</cite> - yum repo_last_sync (optional)</p>
+<li><p class="first"><cite>string</cite> - <strong>description</strong></p>
 </li>
 <li><p class="first"><cite>string</cite> - <strong>end_of_life</strong></p>
 </li>
+<li><p class="first"><cite>bool</cite> - <strong>globally_subscribable</strong> Whether anyone can register to the channel</p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>gpg_key_fp</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>gpg_key_id</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>gpg_key_url</strong></p>
+</li>
+<li><p class="first"><cite>int</cite> - <strong>id</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>label</strong></p>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> - <strong>last_modified</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>maintainer_email</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>maintainer_name</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>maintainer_phone</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>name</strong></p>
+</li>
 <li><p class="first"><cite>string</cite> - <strong>parent_channel_label</strong></p>
 </li>
-<li><p class="first"><cite>string</cite> - <strong>clone_original</strong></p>
+<li><p class="first"><cite>string</cite> - <strong>summary</strong></p>
+</li>
+<li><p class="first"><cite>string</cite> - <strong>support_policy</strong></p>
+</li>
+<li><p class="first"><cite>quartz</cite> - <strong>sync_schedule</strong></p>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> - yum repo_last_sync (optional)</p>
 </li>
 <li><dl class="first docutils">
-<dt><cite>list</cite> - <strong>repos</strong></dt>
+<dt><cite>list</cite> - <strong>all_packages</strong> All packages available in the channel</dt>
 <dd><ul class="first last simple">
-<li><cite>int</cite> - <strong>id</strong></li>
+<li><cite>int</cite> - <strong>pkgid</strong></li>
 </ul>
 </dd>
 </dl>
-</li>
-<li><dl class="first docutils">
-<dt><cite>dict</cite> - <strong>all_packages</strong> All packages available in the channel</dt>
-<dd><ul class="first last">
-<li><dl class="first docutils">
-<dt><cite>pkgid</cite>:</dt>
-<dd><ul class="first last simple">
-<li><a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> object</li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt><cite>dict</cite> - <strong>latest_packages</strong> Latest versions of packages in the channel</dt>
-<dd><ul class="first last">
-<li><dl class="first docutils">
-<dt><cite>pkgid</cite>:</dt>
-<dd><ul class="first last simple">
-<li><a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> object</li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><dl class="first docutils">
-<dt><cite>dict</cite> - <strong>older_packages</strong> Older versions of packages in the channel</dt>
-<dd><ul class="first last">
-<li><dl class="first docutils">
-<dt><cite>int</cite> <strong>pkgid</strong>:</dt>
-<dd><ul class="first last simple">
-<li><a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> object</li>
-</ul>
-</dd>
-</dl>
-</li>
-</ul>
-</dd>
-</dl>
-</li>
-<li><p class="first"><cite>bool</cite> - <strong>globally_subscribable</strong> Whether anyone can register to the channel</p>
 </li>
 <li><dl class="first docutils">
 <dt><cite>list</cite> - <strong>children</strong>  channels who are children of the channel</dt>
@@ -175,18 +132,42 @@ simple fast access to the relevant details about the channel.</p>
 </dl>
 </li>
 <li><dl class="first docutils">
-<dt><cite>dict</cite> - <strong>errata</strong> all errata assigned to the channel</dt>
+<dt><cite>list</cite> - <strong>errata</strong> all errata assigned to the channel</dt>
 <dd><ul class="first last simple">
 <li><cite>int</cite> <strong>id</strong> - Errata ID.</li>
 </ul>
 </dd>
 </dl>
 </li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>latest_packages</strong> Latest versions of packages in the channel</dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite> - <strong>pkgid</strong></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>older_packages</strong> Older versions of packages in the channel</dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite> - <strong>pkgid</strong></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>repos</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>label</cite> - <strong>label</strong></li>
+</ul>
+</dd>
+</dl>
+</li>
 </ul>
 </div></blockquote>
-<dl class="method">
+<dl class="function">
 <dt id="Houston.libhouston.Channel.add_pkg">
-<tt class="descname">add_pkg</tt><big>(</big><em>pkgids</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.add_pkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.add_pkg" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_pkg</tt><big>(</big><em>self</em>, <em>pkgids</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.add_pkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.add_pkg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds packages to the given channels</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -205,9 +186,9 @@ simple fast access to the relevant details about the channel.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="function">
 <dt id="Houston.libhouston.Channel.clone">
-<tt class="descname">clone</tt><big>(</big><em>new_channel</em>, <em>state=True</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.clone" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">clone</tt><big>(</big><em>self</em>, <em>new_channel</em>, <em>state=True</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.clone" title="Permalink to this definition">¶</a></dt>
 <dd><p>clones channel using new_channel params</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -232,9 +213,9 @@ simple fast access to the relevant details about the channel.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="function">
 <dt id="Houston.libhouston.Channel.delete">
-<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><em>self</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>deletes specified channel</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -252,14 +233,119 @@ simple fast access to the relevant details about the channel.</p>
 
 <dl class="class">
 <dt id="Houston.libhouston.PKG">
-<em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">PKG</tt><big>(</big><em>pkgid</em>, <em>spw</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#PKG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.PKG" title="Permalink to this definition">¶</a></dt>
-<dd><p>OO representation of an RPM.</p>
+<em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">PKG</tt><big>(</big><em>pkg</em>, <em>spw</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#PKG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.PKG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Object representation of an RPM.</p>
 <p>This module intends to instantiate an object that can be used as if it
-was an rpm and interface with the rhn server.</p>
-<dl class="method">
+was an rpm and interface with the rhn server for all rpm specific tasks</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pkg</strong> (<a class="reference external" href="http://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)"><em>dict</em></a>) &#8211; package to represent</li>
+<li><strong>spw</strong> &#8211; <a class="reference internal" href="#Houston.libhouston.Spacewalk" title="Houston.libhouston.Spacewalk"><tt class="xref py py-class docutils literal"><span class="pre">Spacewalk</span></tt></a> instance</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>pkg dict needs to contain either:</dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite> <strong>id</strong> pkgid of the package to represent</li>
+</ul>
+</dd>
+<dt><strong>OR</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> <strong>name</strong> name of package</li>
+<li><cite>str</cite> <strong>version</strong> version of package</li>
+<li><cite>str</cite> <strong>release</strong> release of package</li>
+<li><cite>str</cite> <strong>epoch</strong> epoch of package</li>
+<li><cite>str</cite> <strong>arch</strong> Arch of package</li>
+</ul>
+</dd>
+</dl>
+<p>If all keys are provided then the id will be used, as it is more reliable,
+others will be ignored.</p>
+<p>From Redhat Docs</p>
+<p>If [epoch] set to something other than empty string, strict matching will
+be used and the epoch string must be correct; if set to an empty string and
+if the epoch is null or there is only one NVRA combination, the NVRA
+combination is returned (Empty string is recommended)</p>
+<p>See <a href="#id1"><span class="problematic" id="id2">`Redhat API Method:findByNvrea`_</span></a> for more detail.</p>
+<p>PKG is intended to be used as a dictionary to access rpm details.</p>
+<dl class="docutils">
+<dt>keys:</dt>
+<dd><ul class="first last">
+<li><p class="first"><cite>str</cite> - <strong>url</strong> location rpm can be downloaded from</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>conflicts</strong> packages conflicting with this one</dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> name of conflicting package</li>
+<li><cite>str</cite> modifier string eg &#8216;&gt;= 1&#8217;</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>requires</strong> packages that must also be installed</dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> name of required package</li>
+<li><cite>str</cite> modifier string eg &#8216;&gt;= 1&#8217;</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>obsoletes</strong> any packages made obsolete by this one</dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> name of obsoleted package</li>
+<li><cite>str</cite> modifier string eg &#8216;&gt;= 1&#8217;</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>provides</strong> names of packages provided</dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> name of provided package</li>
+<li><cite>str</cite> modifier string eg &#8216;= 1&#8217;</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>files</strong> list of files owned by the package</dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> path</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>channels</strong> channels pacakge is available in</dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> channel label</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>errata</strong> all errata associated with the channel</dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite> errata id</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+<dl class="function">
 <dt id="Houston.libhouston.PKG.dependends_on_me">
-<tt class="descname">dependends_on_me</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.PKG.dependends_on_me" title="Permalink to this definition">¶</a></dt>
-<dd><p>removes pkg from the channel</p>
+<tt class="descname">dependends_on_me</tt><big>(</big><em>self</em>, <em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.PKG.dependends_on_me" title="Permalink to this definition">¶</a></dt>
+<dd><p>discovers packages that require self</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -270,6 +356,24 @@ was an rpm and interface with the rhn server.</p>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="Houston.libhouston.Repo">
+<em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">Repo</tt><big>(</big><em>label</em>, <em>spw</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Repo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Docstring for Repo</p>
+<dl class="function">
+<dt id="Houston.libhouston.Repo.get_sqlite_metadata">
+<tt class="descname">get_sqlite_metadata</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Repo.get_sqlite_metadata" title="Permalink to this definition">¶</a></dt>
+<dd><p>gets the repodata sqlite db from the repo
+:returns: <cite>str</cite> path to sqlite db</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">It is the responsibility of the caller to clean up
+after themselves and delete the temporary file.</p>
+</div>
 </dd></dl>
 
 </dd></dl>
@@ -301,9 +405,9 @@ need to be done manually.  For security&#8217;s sake using spacewalk as a contex
 manager is best.</p>
 <p>There are several useful generic Methods for interacting with the Spacewalk
 server, but most of the grunt work is done by Namespaced classes.</p>
-<dl class="method">
+<dl class="function">
 <dt id="Houston.libhouston.Spacewalk.api_call">
-<tt class="descname">api_call</tt><big>(</big><em>namespace</em>, <em>method</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.api_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.api_call" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">api_call</tt><big>(</big><em>self</em>, <em>namespace</em>, <em>method</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.api_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.api_call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes RPC call to the server.</p>
 <p>The session key will be automatically added, any other arguments must
 be supplied.</p>
@@ -325,9 +429,9 @@ be supplied.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="function">
 <dt id="Houston.libhouston.Spacewalk.channel_exists">
-<tt class="descname">channel_exists</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Spacewalk.channel_exists" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">channel_exists</tt><big>(</big><em>self</em>, <em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Spacewalk.channel_exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks to see if channel exists.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -341,9 +445,9 @@ be supplied.</p>
 </table>
 </dd></dl>
 
-<dl class="method">
+<dl class="function">
 <dt id="Houston.libhouston.Spacewalk.lucerne_query">
-<tt class="descname">lucerne_query</tt><big>(</big><em>query</em>, <em>channels=None</em>, <em>keys=None</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.lucerne_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.lucerne_query" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">lucerne_query</tt><big>(</big><em>self</em>, <em>query</em>, <em>channels=None</em>, <em>keys=None</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.lucerne_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.lucerne_query" title="Permalink to this definition">¶</a></dt>
 <dd><p>runs lucerne query on the spacewalk server</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -384,7 +488,7 @@ be supplied.</p>
 </tr>
 </tbody>
 </table>
-<p>runs the <a href="#id1"><span class="problematic" id="id2">`lucerne query`_</span></a> provided and returns a list of dicts with
+<p>runs the <a href="#id3"><span class="problematic" id="id4">`lucerne query`_</span></a> provided and returns a list of dicts with
 the keys above.</p>
 <p>If any channels or activation keys are supplied then the
 query is run against each one in turn ( using appropriate
@@ -392,9 +496,9 @@ rpc calls e.g. <a class="reference external" href="https://access.redhat.com/sit
 Then the results of each call are merged, de-duplicated and returned.</p>
 </dd></dl>
 
-<dl class="method">
+<dl class="function">
 <dt id="Houston.libhouston.Spacewalk.subscribe_base_channel">
-<tt class="descname">subscribe_base_channel</tt><big>(</big><em>systemid</em>, <em>channel</em>, <em>recurse</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.subscribe_base_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.subscribe_base_channel" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">subscribe_base_channel</tt><big>(</big><em>self</em>, <em>systemid</em>, <em>channel</em>, <em>recurse</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.subscribe_base_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.subscribe_base_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subscribes system (systemid) to base channel (channel).</p>
 <p>This will also determine all allowed child channels the system
 can be subscribed to and subscribe it to them.</p>
@@ -440,6 +544,426 @@ can be subscribed to and subscribe it to them.</p>
 <dt id="Houston.libhouston.SpacewalkInvalidCredentials">
 <em class="property">exception </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">SpacewalkInvalidCredentials</tt><a class="reference internal" href="_modules/Houston/libhouston.html#SpacewalkInvalidCredentials"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.SpacewalkInvalidCredentials" title="Permalink to this definition">¶</a></dt>
 <dd><p>Exception to raise for any invalid credentials</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="Houston.libhouston.SpacewalkPKGError">
+<em class="property">exception </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">SpacewalkPKGError</tt><a class="headerlink" href="#Houston.libhouston.SpacewalkPKGError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Any PKG related Exceptions</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="Houston.libhouston.System">
+<em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">System</tt><big>(</big><em>sysid</em>, <em>spw</em><big>)</big><a class="headerlink" href="#Houston.libhouston.System" title="Permalink to this definition">¶</a></dt>
+<dd><p>Obj representation of a System Object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sysid</strong> (<a class="reference external" href="http://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Id of the system to represent</li>
+<li><strong>spw</strong> &#8211; instance of <a class="reference internal" href="#Houston.libhouston.Spacewalk" title="Houston.libhouston.Spacewalk"><tt class="xref py py-class docutils literal"><span class="pre">Spacewalk</span></tt></a></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><p><a class="reference internal" href="#Houston.libhouston.System" title="Houston.libhouston.System"><tt class="xref py py-class docutils literal"><span class="pre">System</span></tt></a> instance</p>
+<ul>
+<li><p class="first"><cite>int</cite>  - <strong>id</strong> system ID</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>profile_name</strong> name of the system profile</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>addon_entitlements</strong> System&#8217;s addon entitlements labels,</dt>
+<dd><p class="first last">including monitoring_entitled,
+provisioning_entitled,
+virtualization_host,
+virtualization_host_platform</p>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>bool</cite> - <strong>auto_update</strong> True if system has auto updates enabled</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>release</strong> Release of the system eg 4AS 5server</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>address1</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>address2</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>city</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>state</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>country</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>building</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>room</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>rack</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>description</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>hostname</strong></p>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> - <strong>last_boot</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>osa_status</strong> Either unknown, offline or online</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>lock_status</strong> True = system locked</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>str</cite>  - <strong>virtualization</strong> Virtualisation type - for virt guests</dt>
+<dd><p class="first last">only</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>devices</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last">
+<li><p class="first"><cite>str</cite> - <strong>device</strong> optional</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>str</cite> - <strong>device_class</strong> Includes CDROM, FIREWIRE, HD,</dt>
+<dd><p class="first last">USB,VIDEO, OTHER etc</p>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>str</cite> - <strong>driver</strong></p>
+</li>
+<li><p class="first"><cite>str</cite> - <strong>description</strong></p>
+</li>
+<li><p class="first"><cite>bus</cite> - <strong>pcitype</strong></p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>dmi</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> - <strong>vendor</strong></li>
+<li><cite>str</cite> - <strong>system</strong></li>
+<li><cite>str</cite> - <strong>product</strong></li>
+<li><cite>str</cite> - <strong>asset</strong></li>
+<li><cite>str</cite> - <strong>board</strong></li>
+<li><cite>str</cite> - <strong>bios_release</strong> (optional)</li>
+<li><cite>str</cite> - <strong>bios_vendor</strong> (optional)</li>
+<li><cite>str</cite> - <strong>bios_version</strong> (optional)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>entitlements</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> - entitlement_label</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>memory</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> - <strong>ram</strong> physical ram in MB</li>
+<li><cite>str</cite> - <strong>swap</strong> swap space in MB</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>str</cite> - <strong>name</strong> Server Name</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>net_dev</strong></dt>
+<dd><ul class="first last">
+<li><p class="first"><cite>dict</cite></p>
+</li>
+<li><p class="first"><cite>str</cite>  -  <strong>ip</strong> - IP address assigned to this network device</p>
+</li>
+<li><p class="first"><cite>str</cite>  -  <strong>interface</strong> - Network interface assigned to device e.g. eth0</p>
+</li>
+<li><p class="first"><cite>str</cite>  -  <strong>netmask</strong> - Network mask assigned to device</p>
+</li>
+<li><p class="first"><cite>str</cite>  -  <strong>hardware_address</strong> - Hardware Address of device.</p>
+</li>
+<li><p class="first"><cite>str</cite>  -  <strong>module</strong> - Network driver used for this device.</p>
+</li>
+<li><p class="first"><cite>str</cite>  -  <strong>broadcast</strong> - Broadcast address for device.</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>ipv6</strong></dt>
+<dd><dl class="first last docutils">
+<dt>struct</dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> -  <strong>address</strong> - IPv6 address of this network device</li>
+<li><cite>str</cite> -  <strong>netmask</strong> - IPv6 netmask of this network device</li>
+<li><cite>str</cite> -  <strong>scope</strong> - IPv6 address scope</li>
+</ul>
+</dd>
+</dl>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> - <strong>registered_since</strong> date system was registered</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>errata</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite> - <strong>id</strong> Errata ID.</li>
+<li><cite>str</cite> - <strong>date</strong> Date erratum was created.</li>
+<li><cite>str</cite> - <strong>update_date</strong> Date erratum was updated.</li>
+<li><cite>str</cite> - <strong>advisory_synopsis</strong> Summary of the erratum.</li>
+<li><cite>str</cite> - <strong>advisory_type</strong> Type label such as Security, Bug Fix</li>
+<li><cite>str</cite> - <strong>advisory_name</strong> Name such as RHSA, etc</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>str</cite> - <strong>kernel</strong> Kernel version currently running system</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>base_channel</strong></dt>
+<dd><ul class="first last">
+<li><p class="first"><cite>int</cite>  - <strong>id</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>name</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>label</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>arch_name</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>summary</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>description</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>checksum_label</strong></p>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> <strong>last_modified</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>ma* `int`  -ainer_name</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>ma* `int`  -ainer_email</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>ma* `int`  -ainer_phone</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>support_policy</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>gpg_key_url</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>gpg_key_id</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>gpg_key_fp</strong></p>
+</li>
+<li><p class="first"><cite>dateTime.iso8601</cite> <strong>yumrepo_last_sync</strong> (optional)</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>end_of_life</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>parent_channel_label</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>clone_original</strong></p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - contentSources</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite>  - <strong>id</strong></li>
+<li><cite>str</cite>  - <strong>label</strong></li>
+<li><cite>str</cite>  - <strong>sourceUrl</strong></li>
+<li><cite>str</cite>  - <strong>type</strong></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>type</cite> <strong>child_channels</strong>  &#8216;list_subscribed_child_channels&#8217;</p>
+</li>
+<li><p class="first"><cite>str</cite> - <strong>uuid</strong> system uuid</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>activation_keys</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> - key</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>notes</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last">
+<li><p class="first"><cite>int</cite>  - <strong>id</strong></p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>subject</strong> - Subject of the note</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>note</strong> - Contents of the note</p>
+</li>
+<li><p class="first"><cite>int</cite>  - <strong>system_id</strong> - The id of the system associated with the note</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>creator</strong> - Creator of the note</p>
+</li>
+<li><dl class="first docutils">
+<dt><cite>date</cite> - <strong>updated</strong> - Date of the last note update</dt>
+<dd><p class="first last">Redhat docs are unclear whether this is
+dateTime.iso8601</p>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>installed_pkgs</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite>  - <strong>id</strong></li>
+<li><cite>str</cite>  - <strong>name</strong></li>
+<li><cite>str</cite>  - <strong>version</strong></li>
+<li><cite>str</cite>  - <strong>release</strong></li>
+<li><cite>str</cite>  - <strong>epoch</strong></li>
+<li><cite>str</cite>  - <strong>arch</strong></li>
+<li><cite>date</cite> - <strong>installtime</strong> - returned only if known</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>cpu</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite>  - <strong>cache</strong></li>
+<li><cite>str</cite>  - <strong>family</strong></li>
+<li><cite>str</cite>  - <strong>mhz</strong></li>
+<li><cite>str</cite>  - <strong>flags</strong></li>
+<li><cite>str</cite>  - <strong>model</strong></li>
+<li><cite>str</cite>  - <strong>vendor</strong></li>
+<li><cite>str</cite>  - <strong>arch</strong></li>
+<li><cite>str</cite>  - <strong>stepping</strong></li>
+<li><cite>str</cite>  - <strong>count</strong></li>
+<li><cite>int</cite>  - <strong>socket_count</strong> (if available)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>dict</cite> - <strong>custom_values</strong></dt>
+<dd><ul class="first last simple">
+<li><cite>str</cite> <strong>custom_key</strong> value key and value can be arbitrary values</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>connection_path</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>int</cite>  - <strong>position</strong> Position of proxy in chain.</dt>
+<dd><p class="first last">The proxy that the system connects
+directly to is listed in position 1.</p>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>int</cite>  - <strong>id</strong> Proxy system id</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>hostname</strong> Proxy host name</p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>event_history</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dateTime.iso8601</cite> <strong>completed</strong> Date that the event</dt>
+<dd><p class="first last">occurred (optional)</p>
+</dd>
+</dl>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>summary</strong> Summary of the event</p>
+</li>
+<li><p class="first"><cite>str</cite>  - <strong>details</strong> Details of the event</p>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><cite>list</cite> - <strong>unscheduled_errata</strong></dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt><cite>dict</cite></dt>
+<dd><ul class="first last simple">
+<li><cite>int</cite>  - <strong>id</strong> Errata Id</li>
+<li><cite>str</cite>  - <strong>date</strong> Date erratum was created.</li>
+<li><cite>str</cite>  - <strong>advisory_type</strong> Type of the advisory.</li>
+<li><cite>str</cite>  - <strong>advisory_name</strong> Name of the advisory.</li>
+<li><cite>str</cite>  - <strong>advisory_synopsis</strong> Summary of the erratum.</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 
