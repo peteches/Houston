@@ -20,11 +20,11 @@ def clone(a):
     with Spacewalk(a.serverurl, a.username) as spw:
 
         try:
-            parent_details = spw.get_channel_details(a.channel)
-        except Spacewalk.SpacewalkError as e:
+            channel = Channel(a.channel, spw)
+        except SpacewalkError as e:
             sys.exit("Error: {}".format(e))
 
-        if parent_details['parent_channel_label']:
+        if channel['parent_channel_label']:
             sys.exit('Error: {} is not Base channel.'.format(a.channel))
 
         try:
@@ -39,40 +39,39 @@ def clone(a):
             'name':
             'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project, mon=month,
                                                    tag=a.tag,
-                                                   orig=parent_details['name']),
+                                                   orig=channel['name']),
             'label':
             'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project, mon=month,
                                                    tag=a.tag,
-                                                   orig=parent_details['label']),
+                                                   orig=channel['label']),
             'summary':
             '''Development clone of {orig} for {proj} tag {tag}.
             This will be only available during {mon} after \
-            which it will be updated.'''.format(orig=parent_details['name'],
+            which it will be updated.'''.format(orig=channel['name'],
                                                 proj=a.project, tag=a.tag,
                                                 mon=month),
         }
 
         try:
             spw.clone_channel(a.channel, new_parent, False)
-        except Spacewalk.SpacewalkError as e:
+        except SpacewalkError as e:
             sys.exit("Error cloning channel {c}:\n"
-                     "{err}".format(err=e, c=parent_details['label']))
+                     "{err}".format(err=e, c=channel['label']))
 
-        for channel in children_to_clone:
-            chann = spw.get_channel_details(channel)
+        for child in channel['children']:
             new_channel = {
                 'name':
                 'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project,
                                                        mon=month, tag=a.tag,
-                                                       orig=chann['name']),
+                                                       orig=child['name']),
                 'label':
                 'dev-{proj}-{mon}-{tag}-{orig}'.format(proj=a.project,
                                                        mon=month, tag=a.tag,
-                                                       orig=chann['label']),
+                                                       orig=child['label']),
                 'summary':
                 '''Development clone of {orig} for {proj} tag {tag}.
                 This will be only available during {mon} after \
-                which it will be updated.'''.format(orig=chann['name'],
+                which it will be updated.'''.format(orig=child['name'],
                                                     proj=a.project, tag=a.tag,
                                                     mon=month),
                 'parent_label':
@@ -80,10 +79,10 @@ def clone(a):
             }
 
             try:
-                spw.clone_channel(chann['label'], new_channel, False)
-            except Spacewalk.SpacewalkError as e:
+                spw.clone_channel(child['label'], new_channel, False)
+            except SpacewalkError as e:
                 sys.exit("Error cloning channel {c}:\n"
-                         "{err}".format(c=chann['label'], err=e))
+                         "{err}".format(c=child['label'], err=e))
 
 
 def delete(a):
@@ -94,23 +93,25 @@ def delete(a):
     :returns: Boolean
 
     '''
-    with Spacewalk.Spacewalk(a.serverurl, a.username) as spw:
-        if not spw.channel_exists:
-            return True
-        child_channels = spw.list_children(a.channel)
-        if bool(child_channels) and not a.recursive:
-            sys.exit("""Channel {} has children. \n
-                     Use recursive flag to delete these channels as well.\
-                     """.format(a.channel).replace('  ', ''))
+    with Spacewalk(a.serverurl, a.username) as spw:
+        try:
+            channel = Channel(a.channel, spw)
+        except SpacewalkChannelNotFound as e:
+            sys.exit("Houston we have a problem:\n\n{}".format(e))
+
+        if len(channel['children']) > 0 and not a.recursive:
+            sys.exit('Channel {} has children. \n'
+                     'Use recursive flag to delete these channels as well.'
+                     "".format(channel['name']))
 
         if a.recursive:
-            for child in child_channels:
+            for child in channel['children']:
                 if a.verbose:
                     print("Deleting channel: {}".format(child))
-                spw.remove_channel(child)
+                child.delete()
         if a.verbose:
             print("Deleting channel: {}".format(a.channel))
-        spw.remove_channel(a.channel)
+        channel.delete()
 
 
 def migrate(a):
@@ -121,9 +122,19 @@ def migrate(a):
     :returns: Boolean
 
     '''
-    with Spacewalk.Spacewalk(a.serverurl, a.username, a.verbose) as spw:
-        for system in spw.list_subscribed_servers(a.from_channel):
-            spw.subscribe_base_channel(system, a.to_channel)
+    with Spacewalk(a.serverurl, a.username, a.verbose) as spw:
+        channel = Channel(a.from_channel, spw)
+        if a.systems:
+            migrations = [s for s in channel['systems']
+                          if str(s['id']) in a.systems]
+        else:
+            migrations = channel['systems']
+
+        for system in migrations:
+            if a.verbose:
+                print("Migrating {} to {}".format(system, a.to_channel))
+            spw.subscribe_base_channel(system['id'], a.to_channel, a.recursive)
+
 
 
 def rollout(a):
@@ -144,10 +155,8 @@ def rollout(a):
      STAGE   PROD
     ======= =======
 
-    New env is what is supplied to the function and the source is calculated.
-
     '''
-    with Spacewalk.Spacewalk(a.serverurl, a.username, a.verbose) as spw:
+    with Spacewalk(a.serverurl, a.username, a.verbose) as spw:
         if not spw.channel_exists(a.channel):
             sys.exit("Error: Channel {c} Does not exist".format(c=a.channel))
 
@@ -164,7 +173,7 @@ def rollout(a):
 
         try:
             spw.clone_channel(a.channel, new_channel, False)
-        except Spacewalk.SpacewalkError as e:
+        except SpacewalkError as e:
             sys.exit("Error cloning channel {c}:\n"
                      "{err}".format(err=e, c=a.channel))
 
@@ -188,7 +197,7 @@ def rollout(a):
 
             try:
                 spw.clone_channel(child, new_channel, False)
-            except Spacewalk.SpacewalkError as e:
+            except SpacewalkError as e:
                 sys.exit("Error cloning channel {c}:\n"
                          "{err}".format(err=e, c=child))
 
@@ -307,37 +316,6 @@ def _obtain_list_of_pkgs(a, spw, all_channels=False):
     return pkgs[int(choice)-1]
 
 
-def pkg_remove(a):
-    '''@todo: Docstring for rollback
-
-    :param a: @todo
-    :type a: @todo
-    :returns: @todo
-
-    '''
-
-    with Spacewalk.Spacewalk() as spw:
-        pkg = _obtain_list_of_pkgs(a, spw)
-
-        deps = spw.pkg_what_depends(pkg)
-
-        spw.channel_remove_pkg([pkg['id']], a.channels)
-
-        for channel in a.channels:
-            srvids.extend(spw.list_subscribed_servers(channel))
-
-
-def pkg_add(a):
-    '''adds a package to a specified channel(s)
-
-
-    '''
-    if not a.channels:
-        sys.exit()
-    with Spacewalk.Spacewalk() as spw:
-        pkg = _obtain_list_of_pkgs(a, spw, True)
-
-        rv = spw.channel_add_pkg([pkg['id']], a.channels)
 def parse_cmd_line():
     '''Parses commad line
     :returns: namespace object
@@ -400,13 +378,19 @@ def parse_cmd_line():
     #  Migrate
 
     parse_migrate = channel_sp.add_parser('migrate',
-                                            help='''Migrates all servers
-                                            registered against <from-channel> and
-                                            re-registers them to <to-channel>''')
+                                          help='''Migrates all servers
+                                          registered against <from-channel> and
+                                          re-registers them to <to-channel>''')
     parse_migrate.add_argument('-f', '--from-channel', required=True,
                                 help='Channel to migrate servers from')
     parse_migrate.add_argument('-t', '--to-channel', required=True,
                                 help='Channel to migrate servers to')
+    parse_migrate.add_argument('-S', '--systems', required=False, nargs='+',
+                               help='''Restrict list of migrated servers to
+                               these ids. Can be a comma seperated list.''')
+    parse_migrate.add_argument('-r', '--recursive', required=False,
+                               action='store_true', help='''subscribe to any
+                               children of <from-channel>''')
     parse_migrate.set_defaults(func=migrate)
 
     #  rollout
