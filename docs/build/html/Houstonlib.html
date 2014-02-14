@@ -165,9 +165,9 @@ simple fast access to the relevant details about the channel.</p>
 </li>
 </ul>
 </div></blockquote>
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Channel.add_pkg">
-<tt class="descname">add_pkg</tt><big>(</big><em>self</em>, <em>pkgids</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.add_pkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.add_pkg" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">add_pkg</tt><big>(</big><em>pkgids</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.add_pkg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.add_pkg" title="Permalink to this definition">¶</a></dt>
 <dd><p>Adds packages to the given channels</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -186,9 +186,9 @@ simple fast access to the relevant details about the channel.</p>
 </table>
 </dd></dl>
 
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Channel.clone">
-<tt class="descname">clone</tt><big>(</big><em>self</em>, <em>new_channel</em>, <em>state=True</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.clone" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">clone</tt><big>(</big><em>new_channel</em>, <em>state=True</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.clone"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.clone" title="Permalink to this definition">¶</a></dt>
 <dd><p>clones channel using new_channel params</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -213,9 +213,9 @@ simple fast access to the relevant details about the channel.</p>
 </table>
 </dd></dl>
 
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Channel.delete">
-<tt class="descname">delete</tt><big>(</big><em>self</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.delete" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">delete</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel.delete" title="Permalink to this definition">¶</a></dt>
 <dd><p>deletes specified channel</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -342,9 +342,9 @@ combination is returned (Empty string is recommended)</p>
 </ul>
 </dd>
 </dl>
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.PKG.dependends_on_me">
-<tt class="descname">dependends_on_me</tt><big>(</big><em>self</em>, <em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.PKG.dependends_on_me" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">dependends_on_me</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.PKG.dependends_on_me" title="Permalink to this definition">¶</a></dt>
 <dd><p>discovers packages that require self</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -364,9 +364,9 @@ combination is returned (Empty string is recommended)</p>
 <dt id="Houston.libhouston.Repo">
 <em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">Repo</tt><big>(</big><em>label</em>, <em>spw</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Docstring for Repo</p>
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Repo.get_sqlite_metadata">
-<tt class="descname">get_sqlite_metadata</tt><big>(</big><em>self</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Repo.get_sqlite_metadata" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">get_sqlite_metadata</tt><big>(</big><big>)</big><a class="headerlink" href="#Houston.libhouston.Repo.get_sqlite_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>gets the repodata sqlite db from the repo
 :returns: <cite>str</cite> path to sqlite db</p>
 <div class="admonition note">
@@ -405,9 +405,9 @@ need to be done manually.  For security&#8217;s sake using spacewalk as a contex
 manager is best.</p>
 <p>There are several useful generic Methods for interacting with the Spacewalk
 server, but most of the grunt work is done by Namespaced classes.</p>
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Spacewalk.api_call">
-<tt class="descname">api_call</tt><big>(</big><em>self</em>, <em>namespace</em>, <em>method</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.api_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.api_call" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">api_call</tt><big>(</big><em>namespace</em>, <em>method</em>, <em>*args</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.api_call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.api_call" title="Permalink to this definition">¶</a></dt>
 <dd><p>Makes RPC call to the server.</p>
 <p>The session key will be automatically added, any other arguments must
 be supplied.</p>
@@ -429,9 +429,9 @@ be supplied.</p>
 </table>
 </dd></dl>
 
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Spacewalk.channel_exists">
-<tt class="descname">channel_exists</tt><big>(</big><em>self</em>, <em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Spacewalk.channel_exists" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">channel_exists</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Spacewalk.channel_exists" title="Permalink to this definition">¶</a></dt>
 <dd><p>checks to see if channel exists.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -445,9 +445,9 @@ be supplied.</p>
 </table>
 </dd></dl>
 
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Spacewalk.lucerne_query">
-<tt class="descname">lucerne_query</tt><big>(</big><em>self</em>, <em>query</em>, <em>channels=None</em>, <em>keys=None</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.lucerne_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.lucerne_query" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">lucerne_query</tt><big>(</big><em>query</em>, <em>channels=None</em>, <em>keys=None</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.lucerne_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.lucerne_query" title="Permalink to this definition">¶</a></dt>
 <dd><p>runs lucerne query on the spacewalk server</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -496,9 +496,9 @@ rpc calls e.g. <a class="reference external" href="https://access.redhat.com/sit
 Then the results of each call are merged, de-duplicated and returned.</p>
 </dd></dl>
 
-<dl class="function">
+<dl class="method">
 <dt id="Houston.libhouston.Spacewalk.subscribe_base_channel">
-<tt class="descname">subscribe_base_channel</tt><big>(</big><em>self</em>, <em>systemid</em>, <em>channel</em>, <em>recurse</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.subscribe_base_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.subscribe_base_channel" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">subscribe_base_channel</tt><big>(</big><em>systemid</em>, <em>channel</em>, <em>recurse</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Spacewalk.subscribe_base_channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Spacewalk.subscribe_base_channel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Subscribes system (systemid) to base channel (channel).</p>
 <p>This will also determine all allowed child channels the system
 can be subscribed to and subscribe it to them.</p>

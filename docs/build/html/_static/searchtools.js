@@ -301,7 +301,7 @@ var Search = {
   },
 
   query : function(query) {
-    var stopwords = ["will","no","then","with","of","into","the","such","not","are","but","is","for","it","they","to","on","or","near","that","as","these","at","in","their","by","if","was","be","and","this","a","there"];
+    var stopwords = ["will","was","then","be","these","by","their","that","they","are","to","this","at","into","but","no","a","for","as","such","of","the","near","on","or","there","not","is","with","it","in","if","and"];
 
     // Stem the searchterms and add them to the correct list
     var stemmer = new Stemmer();

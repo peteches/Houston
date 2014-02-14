@@ -316,6 +316,25 @@ def _obtain_list_of_pkgs(a, spw, all_channels=False):
     return pkgs[int(choice)-1]
 
 
+def pkg_remove(a):
+    '''@todo: Docstring for rollback
+
+    :param a: @todo
+    :type a: @todo
+    :returns: @todo
+
+    '''
+    pass  # stub function
+
+
+
+
+def pkg_add(a):
+    '''adds a package to a specified channel(s)
+
+
+    '''
+    pass #  stub function
 def parse_cmd_line():
     '''Parses commad line
     :returns: namespace object
