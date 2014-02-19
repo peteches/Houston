@@ -27,13 +27,6 @@ def clone(a):
         if channel['parent_channel_label']:
             sys.exit('Error: {} is not Base channel.'.format(a.channel))
 
-        try:
-            children_to_clone = spw.list_children(a.channel)
-        except (Spacewalk.SpacewalkError,
-                Spacewalk.SpacewalkChannelNotFound) as e:
-            sys.exit("Error listing children: \n{err}".format(f=sys.argv[0],
-                                                              err=e))
-
         month = time.strftime("%b").lower()  # abbrv month name
         new_parent = {
             'name':
@@ -53,7 +46,7 @@ def clone(a):
         }
 
         try:
-            spw.clone_channel(a.channel, new_parent, False)
+            channel.clone(new_parent, False)
         except SpacewalkError as e:
             sys.exit("Error cloning channel {c}:\n"
                      "{err}".format(err=e, c=channel['label']))
@@ -79,7 +72,7 @@ def clone(a):
             }
 
             try:
-                spw.clone_channel(child['label'], new_channel, False)
+                child.clone(new_channel, False)
             except SpacewalkError as e:
                 sys.exit("Error cloning channel {c}:\n"
                          "{err}".format(c=child['label'], err=e))
