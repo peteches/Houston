@@ -48,6 +48,9 @@
           <div class="body">
             
   <span class="target" id="module-Houston.libhouston"></span><p>Houston Library</p>
+<p>Can be used as a context manager, in which case it will log out of the session
+during __exit__(). If instantiated manually then this will also need to be done
+manually.  For security&#8217;s sake using spacewalk as a context manager is best.</p>
 <dl class="class">
 <dt id="Houston.libhouston.Channel">
 <em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">Channel</tt><big>(</big><em>label</em>, <em>spw</em><big>)</big><a class="reference internal" href="_modules/Houston/libhouston.html#Channel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#Houston.libhouston.Channel" title="Permalink to this definition">¶</a></dt>
@@ -342,40 +345,12 @@ combination is returned (Empty string is recommended)</p>
 </ul>
 </dd>
 </dl>
-<dl class="method">
-<dt id="Houston.libhouston.PKG.dependends_on_me">
-<tt class="descname">dependends_on_me</tt><big>(</big><em>channel</em><big>)</big><a class="headerlink" href="#Houston.libhouston.PKG.dependends_on_me" title="Permalink to this definition">¶</a></dt>
-<dd><p>discovers packages that require self</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>channel</strong> &#8211; channel to find deps in</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of <a class="reference internal" href="#Houston.libhouston.PKG" title="Houston.libhouston.PKG"><tt class="xref py py-class docutils literal"><span class="pre">PKG</span></tt></a> objects</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
 <dt id="Houston.libhouston.Repo">
 <em class="property">class </em><tt class="descclassname">Houston.libhouston.</tt><tt class="descname">Repo</tt><big>(</big><em>label</em>, <em>spw</em><big>)</big><a class="headerlink" href="#Houston.libhouston.Repo" title="Permalink to this definition">¶</a></dt>
 <dd><p>Docstring for Repo</p>
-<dl class="method">
-<dt id="Houston.libhouston.Repo.get_sqlite_metadata">
-<tt class="descname">get_sqlite_metadata</tt><big>(</big><big>)</big><a class="headerlink" href="#Houston.libhouston.Repo.get_sqlite_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>gets the repodata sqlite db from the repo
-:returns: <cite>str</cite> path to sqlite db</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">It is the responsibility of the caller to clean up
-after themselves and delete the temporary file.</p>
-</div>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">

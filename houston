@@ -119,14 +119,14 @@ def migrate(a):
         channel = Channel(a.from_channel, spw)
         if a.systems:
             migrations = [s for s in channel['systems']
-                          if str(s['id']) in a.systems]
+                          if str(s) in a.systems]
         else:
             migrations = channel['systems']
 
         for system in migrations:
             if a.verbose:
                 print("Migrating {} to {}".format(system, a.to_channel))
-            spw.subscribe_base_channel(system['id'], a.to_channel, a.recursive)
+            spw.subscribe_base_channel(system, a.to_channel, a.recursive)
 
 
 
@@ -157,7 +157,7 @@ def rollout(a):
         src_env = a.channel.split('-')[0]
         dst_env = rollout_order[rollout_order.index(src_env) + 1]
 
-        old_channel = spw.get_channel_details(a.channel)
+        old_channel = Channel(a.channel, spw)
         new_channel = {
             'label': old_channel['label'].replace(src_env, dst_env),
             'name': old_channel['name'].replace(src_env, dst_env),
@@ -165,31 +165,30 @@ def rollout(a):
         }
 
         try:
-            spw.clone_channel(a.channel, new_channel, False)
+            old_channel.clone(new_channel, False)
         except SpacewalkError as e:
             sys.exit("Error cloning channel {c}:\n"
                      "{err}".format(err=e, c=a.channel))
 
-        for child in spw.list_children(a.channel):
-            old_channel = spw.get_channel_details(child)
+        for child in old_channel['children']:
             # yeah this is a little tedious, but it appears that the dict
             # returned from a get_details call has different keys than that
             # accepted by the clone channel api call.
             new_channel = {
                 'label':
-                old_channel['label'].replace(src_env, dst_env),
+                child['label'].replace(src_env, dst_env),
                 'name':
-                old_channel['name'].replace(src_env, dst_env),
+                child['name'].replace(src_env, dst_env),
                 'summary':
-                old_channel['summary'].replace(src_env, dst_env),
+                child['summary'].replace(src_env, dst_env),
                 'description':
-                old_channel['description'].replace(src_env, dst_env),
+                child['description'].replace(src_env, dst_env),
                 'parent_label':
-                old_channel['parent_channel_label'].replace(src_env, dst_env),
+                child['parent_channel_label'].replace(src_env, dst_env),
             }
 
             try:
-                spw.clone_channel(child, new_channel, False)
+                child.clone(new_channel, False)
             except SpacewalkError as e:
                 sys.exit("Error cloning channel {c}:\n"
                          "{err}".format(err=e, c=child))
@@ -317,17 +316,15 @@ def pkg_remove(a):
     :returns: @todo
 
     '''
-    pass  # stub function
-
-
-
+    print("Stubbed function")
 
 def pkg_add(a):
     '''adds a package to a specified channel(s)
 
 
     '''
-    pass #  stub function
+    print("Stubbed function")
+
 def parse_cmd_line():
     '''Parses commad line
     :returns: namespace object
@@ -458,7 +455,11 @@ if __name__ == '__main__':
 
     args = parse_cmd_line()
 
-    if 'func' in args:
-        args.func(args)
-    else:
-        parent_parser.print_help()
+    try:
+        if 'func' in args:
+            args.func(args)
+        else:
+            parent_parser.print_help()
+    except KeyboardInterrupt:
+        sys.exit("Telepathic skills indicate the user wishes to exit.\n"
+                 "So I will.")
