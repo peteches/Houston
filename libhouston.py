@@ -522,7 +522,7 @@ class Channel(collections.UserDict):
 
         '''
         try:
-            self.channel_exists(new_channel['label'])
+            self.__spw__.channel_exists(new_channel['label'])
         except SpacewalkChannelNotFound:
             pass
         else:
